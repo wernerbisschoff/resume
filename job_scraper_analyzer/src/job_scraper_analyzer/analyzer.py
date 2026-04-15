@@ -11,9 +11,14 @@ import json
 import subprocess
 import uuid
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 from job_scraper_analyzer.models import Analysis, Job
+
+# Constants
+DROID_TIMEOUT_SECONDS = 120
+DROID_NOT_FOUND_CODE = 127
+RATE_LIMIT_CODE = 429
 
 
 def analyze_jobs(
@@ -62,39 +67,53 @@ def analyze_jobs(
     return results
 
 
-def _analyze_batch(
-    batch: List[Job],
-    cv_summary: str,
-    batch_id: str,
-    max_retries: int,
-    batch_size: int = 5,
-) -> List[Analysis]:
-    """Analyze a single batch of jobs using droid exec.
+def _call_droid_exec(prompt: str, max_retries: int) -> str:
+    """Execute droid exec command and return response.
     
     Args:
-        batch: List of jobs in this batch
-        cv_summary: CV summary for context
-        batch_id: Batch identifier for tracking
+        prompt: Prompt string to send to droid
         max_retries: Maximum retry attempts
-        batch_size: Original batch size for threshold calculation
     
     Returns:
-        List of Analysis objects for this batch
+        Response text from droid exec
+    
+    Raises:
+        RuntimeError: If droid exec fails after retries
+        FileNotFoundError: If droid command not found
     """
-    results: List[Analysis] = []
-    
-    # If batch_size >= number of jobs, process each individually for better AI focus
-    # Otherwise, combine into a single prompt
-    if batch_size >= len(batch):
-        for job in batch:
-            result = _analyze_single_job(job, cv_summary, batch_id, max_retries)
-            results.append(result)
-    else:
-        # For larger batches, combine into single prompt
-        result = _analyze_batch_combined(batch, cv_summary, batch_id, max_retries)
-        results.extend(result)
-    
-    return results
+    retries = 0
+    while retries <= max_retries:
+        try:
+            result = subprocess.run(
+                ["droid", "exec", "--auto", "low", prompt],
+                capture_output=True,
+                text=True,
+                timeout=DROID_TIMEOUT_SECONDS,
+            )
+            
+            if result.returncode == RATE_LIMIT_CODE:
+                if retries < max_retries:
+                    retries += 1
+                    continue
+                raise RuntimeError("Rate limited by AI service (429)")
+            
+            if result.returncode == DROID_NOT_FOUND_CODE or "not found" in result.stderr.lower():
+                raise FileNotFoundError("droid: command not found")
+            
+            if result.returncode != 0:
+                raise RuntimeError(f"droid exec failed: {result.stderr}")
+            
+            return result.stdout.strip()
+            
+        except FileNotFoundError as e:
+            raise RuntimeError(f"droid not installed: {e}")
+        except RuntimeError:
+            raise
+        except Exception as e:
+            if retries < max_retries:
+                retries += 1
+                continue
+            raise RuntimeError(f"droid exec failed after {max_retries} retries: {e}")
 
 
 def _analyze_batch_combined(
@@ -114,45 +133,11 @@ def _analyze_batch_combined(
     Returns:
         List of Analysis objects for this batch
     """
-    retries = 0
     prompts = [_build_analysis_prompt(job, cv_summary) for job in batch]
     combined_prompt = "\n---\n".join(prompts)
     
-    while retries <= max_retries:
-        try:
-            result = subprocess.run(
-                ["droid", "exec", "--auto", "low", combined_prompt],
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-            
-            # Handle rate limiting
-            if result.returncode == 429:
-                if retries < max_retries:
-                    retries += 1
-                    continue
-                raise RuntimeError("Rate limited by AI service (429)")
-            
-            # Handle droid not found
-            if result.returncode == 127 or "not found" in result.stderr.lower():
-                raise FileNotFoundError("droid: command not found")
-            
-            if result.returncode != 0:
-                raise RuntimeError(f"droid exec failed: {result.stderr}")
-            
-            # Parse the response
-            response_text = result.stdout.strip()
-            batch_results = _parse_batch_response(response_text, batch, batch_id)
-            return batch_results
-            
-        except FileNotFoundError as e:
-            raise RuntimeError(f"droid not installed: {e}")
-        except Exception as e:
-            if retries < max_retries:
-                retries += 1
-                continue
-            raise RuntimeError(f"droid exec failed after {max_retries} retries: {e}")
+    response_text = _call_droid_exec(combined_prompt, max_retries)
+    return _parse_batch_response(response_text, batch, batch_id)
 
 
 def _analyze_single_job(
@@ -172,61 +157,26 @@ def _analyze_single_job(
     Returns:
         Analysis object for the job
     """
-    retries = 0
     prompt = _build_analysis_prompt(job, cv_summary)
     
-    while retries <= max_retries:
-        try:
-            result = subprocess.run(
-                ["droid", "exec", "--auto", "low", prompt],
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-            
-            # Handle rate limiting
-            if result.returncode == 429:
-                if retries < max_retries:
-                    retries += 1
-                    continue
-                raise RuntimeError("Rate limited by AI service (429)")
-            
-            # Handle droid not found
-            if result.returncode == 127 or "not found" in result.stderr.lower():
-                raise FileNotFoundError("droid: command not found")
-            
-            if result.returncode != 0:
-                raise RuntimeError(f"droid exec failed: {result.stderr}")
-            
-            # Parse the response
-            response_text = result.stdout.strip()
-            fit_rating, justification = _parse_droid_response(response_text)
-            
-            return Analysis(
-                job_id=0,  # Job.id not available on Pydantic model
-                batch_id=batch_id,
-                fit_rating=fit_rating,
-                justification=justification,
-            )
-            
-        except FileNotFoundError as e:
-            raise RuntimeError(f"droid not installed: {e}")
-        except (ValueError, KeyError) as e:
-            if retries < max_retries:
-                retries += 1
-                continue
-            # Return default analysis if parsing fails after retries
-            return Analysis(
-                job_id=0,
-                batch_id=batch_id,
-                fit_rating=2,  # Default to Marginal
-                justification="Unable to parse AI response",
-            )
-        except Exception as e:
-            if retries < max_retries:
-                retries += 1
-                continue
-            raise RuntimeError(f"droid exec failed after {max_retries} retries: {e}")
+    try:
+        response_text = _call_droid_exec(prompt, max_retries)
+        fit_rating, justification = _parse_droid_response(response_text)
+    except (ValueError, KeyError):
+        # Return default analysis if parsing fails
+        return Analysis(
+            job_id=0,
+            batch_id=batch_id,
+            fit_rating=2,  # Default to Marginal
+            justification="Unable to parse AI response",
+        )
+    
+    return Analysis(
+        job_id=0,  # Job.id not available on Pydantic model
+        batch_id=batch_id,
+        fit_rating=fit_rating,
+        justification=justification,
+    )
 
 
 def _parse_batch_response(
