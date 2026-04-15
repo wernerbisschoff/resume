@@ -4,7 +4,7 @@
 [Phase_Goal]: Initialize `uv` project with mise environment and minimal dependencies
 
 ### [TASKS]
-- [ ] [T001] Initialize uv project with mise environment and minimal dependencies
+- [x] [T001] Initialize uv project with mise environment and minimal dependencies
   - [Task_Type]: Infra_Batch
   - [Execution_Mode]: IMMEDIATE
   - [Verification]: `cd job_scraper_analyzer && uv run python -c "import job_scraper_analyzer; print('OK')"`
