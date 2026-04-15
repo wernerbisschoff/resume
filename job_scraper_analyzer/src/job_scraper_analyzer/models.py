@@ -1,47 +1,21 @@
-"""Pydantic models for Job, Search, and Analysis entities.
-
-These models are defined per the data-model.md specification.
-"""
+"""Pydantic models for Job, Search, and Analysis entities."""
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Annotated, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Job(BaseModel):
-    """Job posting entity with all scraped data and analysis results.
-    
-    Attributes:
-        job_url: Unique URL to the job posting (required)
-        site: Job board site ('linkedin', 'indeed', 'google')
-        title: Job title (required)
-        company: Company name
-        location: Job location
-        is_remote: Whether job is remote
-        job_type: Type of employment ('fulltime', 'parttime', 'contract', 'internship', 'temporary')
-        description: Full job description text
-        min_salary: Minimum salary offered
-        max_salary: Maximum salary offered
-        salary_currency: Currency code (defaults to 'USD')
-        salary_interval: Salary interval ('yearly', 'hourly', etc.)
-        date_posted: Date the job was posted
-        job_level: Experience level ('Senior', 'Mid', 'Entry', etc.)
-        company_industry: Industry the company belongs to
-        fit_rating: 1-4 rating from AI analysis (1=No Fit, 2=Marginal, 3=Good, 4=Perfect)
-        status: Review status ('new', 'applied', 'declined', 'skip')
-        search_id: Reference to the search that found this job
-        scraped_at: Timestamp when job was scraped
-        analyzed_at: Timestamp when job was analyzed
-    """
-    
+    """Job posting entity with scraped data and analysis results."""
+
     job_url: str
-    site: str
+    site: Literal["linkedin", "indeed", "google"]
     title: str
     company: Optional[str] = None
     location: Optional[str] = None
     is_remote: Optional[bool] = None
-    job_type: Optional[str] = None
+    job_type: Optional[Literal["fulltime", "parttime", "contract", "internship", "temporary"]] = None
     description: Optional[str] = None
     min_salary: Optional[float] = None
     max_salary: Optional[float] = None
@@ -50,25 +24,24 @@ class Job(BaseModel):
     date_posted: Optional[date] = None
     job_level: Optional[str] = None
     company_industry: Optional[str] = None
-    fit_rating: Optional[int] = None
-    status: str = "new"
+    fit_rating: Optional[Literal[1, 2, 3, 4]] = None
+    status: Literal["new", "applied", "declined", "skip"] = "new"
     search_id: Optional[int] = None
     scraped_at: Optional[datetime] = None
     analyzed_at: Optional[datetime] = None
 
+    @field_validator("job_url")
+    @classmethod
+    def validate_job_url(cls, v: str) -> str:
+        """Validate URL format for job_url."""
+        if not v.startswith(("http://", "https://")):
+            raise ValueError("job_url must be a valid HTTP/HTTPS URL")
+        return v
+
 
 class Search(BaseModel):
-    """Search parameters for job scraping.
-    
-    Attributes:
-        search_term: The job search query (required)
-        location: Geographic location filter
-        is_remote: Filter for remote jobs
-        hours_old: Filter for jobs posted within N hours
-        job_type: Filter for job type
-        site_name: Comma-separated list of sites to search
-    """
-    
+    """Search parameters for job scraping."""
+
     search_term: str
     location: Optional[str] = None
     is_remote: bool = False
@@ -78,17 +51,9 @@ class Search(BaseModel):
 
 
 class Analysis(BaseModel):
-    """AI analysis result for a job posting.
-    
-    Attributes:
-        job_id: Reference to the job being analyzed (required)
-        batch_id: Batch identifier for grouping analyses
-        fit_rating: 1-4 rating (1=No Fit, 2=Marginal, 3=Good, 4=Perfect)
-        justification: Explanation of the fit rating
-        analyzed_at: Timestamp when analysis was performed
-    """
-    
+    """AI analysis result for a job posting."""
+
     job_id: int
     batch_id: Optional[str] = None
-    fit_rating: int
+    fit_rating: Literal[1, 2, 3, 4]
     justification: str
