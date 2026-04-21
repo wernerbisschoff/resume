@@ -1,9 +1,9 @@
 """Pydantic models for Job, Search, and Analysis entities."""
 
 from datetime import date, datetime
-from typing import Annotated, Literal, Optional
+from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, field_validator
 
 
 class Job(BaseModel):

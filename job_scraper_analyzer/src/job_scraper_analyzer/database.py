@@ -12,14 +12,14 @@ from job_scraper_analyzer.models import Analysis, Job
 @contextmanager
 def _db_connection(db_path: Path, row_factory: bool = False) -> Generator[Tuple[sqlite3.Connection, sqlite3.Cursor], None, None]:
     """Context manager for database connections with optional row_factory.
-    
+
     Args:
         db_path: Path to the SQLite database
         row_factory: If True, sets row_factory to sqlite3.Row for column access
-        
+
     Yields:
         Tuple of (connection, cursor)
-        
+
     Raises:
         sqlite3.Error: If database connection fails
     """
@@ -97,13 +97,13 @@ CREATE_INDEXES = [
 
 def init_db(db_path: Path) -> None:
     """Initialize the database with required tables and indexes.
-    
+
     Creates jobs, searches, and analyses tables with appropriate indexes
     per the data-model.md specification.
-    
+
     Args:
         db_path: Path to the SQLite database file
-        
+
     Raises:
         sqlite3.Error: If database creation fails
         OSError: If path is invalid or not writable
@@ -112,19 +112,19 @@ def init_db(db_path: Path) -> None:
         cursor.execute(CREATE_JOBS_TABLE)
         cursor.execute(CREATE_SEARCHES_TABLE)
         cursor.execute(CREATE_ANALYSES_TABLE)
-        
+
         for index_sql in CREATE_INDEXES:
             cursor.execute(index_sql)
-        
+
         conn.commit()
 
 
 def _job_to_row(job: Job) -> dict:
     """Convert a Job model to a dictionary for SQL insertion.
-    
+
     Args:
         job: Job model instance
-        
+
     Returns:
         Dictionary with job fields as SQL column values
     """
@@ -154,10 +154,10 @@ def _job_to_row(job: Job) -> dict:
 
 def _row_to_job(row: sqlite3.Row) -> Job:
     """Convert a SQL row to a Job model.
-    
+
     Args:
         row: SQLite Row instance
-        
+
     Returns:
         Job model instance
     """
@@ -187,23 +187,23 @@ def _row_to_job(row: sqlite3.Row) -> Job:
 
 def upsert_job(job: Job, db_path: Path) -> int:
     """Insert a new job or update an existing one based on job_url.
-    
+
     Uses INSERT OR REPLACE strategy - if job_url exists, updates the record.
     Returns the database ID of the inserted/updated job.
-    
+
     Args:
         job: Job model instance to upsert
         db_path: Path to the SQLite database
-        
+
     Returns:
         Database ID (primary key) of the inserted/updated job
     """
     with _db_connection(db_path, row_factory=True) as (conn, cursor):
         cursor.execute("SELECT id FROM jobs WHERE job_url = ?", (job.job_url,))
         existing = cursor.fetchone()
-        
+
         row_data = _job_to_row(job)
-        
+
         if existing:
             job_id = existing["id"]
             set_clauses = []
@@ -213,7 +213,7 @@ def upsert_job(job: Job, db_path: Path) -> int:
                     set_clauses.append(f"{key} = ?")
                     values.append(value)
             values.append(job_id)
-            
+
             cursor.execute(f"UPDATE jobs SET {', '.join(set_clauses)} WHERE id = ?", values)
         else:
             columns = list(row_data.keys())
@@ -223,18 +223,18 @@ def upsert_job(job: Job, db_path: Path) -> int:
                 list(row_data.values())
             )
             job_id = cursor.lastrowid
-        
+
         conn.commit()
         return job_id
 
 
 def get_jobs_by_status(status: str, db_path: Path) -> List[Job]:
     """Retrieve all jobs with the specified status.
-    
+
     Args:
         status: Job status to filter by ('new', 'applied', 'declined', 'skip')
         db_path: Path to the SQLite database
-        
+
     Returns:
         List of Job model instances matching the status
     """
@@ -243,18 +243,65 @@ def get_jobs_by_status(status: str, db_path: Path) -> List[Job]:
         return [_row_to_job(row) for row in cursor.fetchall()]
 
 
-def get_jobs_needing_analysis(limit: int, db_path: Path) -> List[Job]:
+def get_jobs_needing_analysis(db_path: Path, limit: Optional[int] = None) -> List[Job]:
     """Retrieve jobs that have not been analyzed yet (fit_rating is NULL).
-    
+
     Args:
-        limit: Maximum number of jobs to return
+        limit: Maximum number of jobs to return, or None for no limit
         db_path: Path to the SQLite database
-        
+
     Returns:
         List of Job model instances with no fit_rating
     """
     with _db_connection(db_path, row_factory=True) as (conn, cursor):
-        cursor.execute("SELECT * FROM jobs WHERE fit_rating IS NULL LIMIT ?", (limit,))
+        if limit is not None:
+            cursor.execute("SELECT * FROM jobs WHERE fit_rating IS NULL LIMIT ?", (limit,))
+        else:
+            cursor.execute("SELECT * FROM jobs WHERE fit_rating IS NULL")
+        return [_row_to_job(row) for row in cursor.fetchall()]
+
+
+def update_job_status(
+    job_url: str,
+    status: str,
+    db_path: Path,
+) -> None:
+    """Update a job's status.
+
+    Args:
+        job_url: The unique job URL identifying the job
+        status: Job status to set ('applied', 'declined', 'new')
+        db_path: Path to the SQLite database
+    """
+    with _db_connection(db_path) as (conn, cursor):
+        cursor.execute(
+            "UPDATE jobs SET status = ? WHERE job_url = ?",
+            (status, job_url),
+        )
+        conn.commit()
+
+
+def get_jobs_needing_review(db_path: Path) -> List[Job]:
+    """Retrieve 'new' jobs sorted by fit_rating (best first), then by date.
+
+    Jobs with fit_rating are shown first (descending), then jobs without
+    fit_rating. This ensures best matches are reviewed first.
+
+    Args:
+        db_path: Path to the SQLite database
+
+    Returns:
+        List of Job model instances with status 'new', sorted by fit_rating
+    """
+    with _db_connection(db_path, row_factory=True) as (conn, cursor):
+        cursor.execute("""
+            SELECT * FROM jobs
+            WHERE status = 'new'
+            ORDER BY
+                CASE WHEN fit_rating IS NULL THEN 1 ELSE 0 END,
+                fit_rating DESC,
+                scraped_at DESC
+        """)
         return [_row_to_job(row) for row in cursor.fetchall()]
 
 
@@ -265,7 +312,7 @@ def update_job_fit_rating(
     status: str = "new",
 ) -> None:
     """Update a job's fit_rating and analyzed_at timestamp.
-    
+
     Args:
         job_url: The unique job URL identifying the job
         fit_rating: The fit rating (1-4) from AI analysis
@@ -274,7 +321,7 @@ def update_job_fit_rating(
     """
     with _db_connection(db_path) as (conn, cursor):
         cursor.execute(
-            """UPDATE jobs 
+            """UPDATE jobs
                SET fit_rating = ?, analyzed_at = CURRENT_TIMESTAMP, status = ?
                WHERE job_url = ?""",
             (fit_rating, status, job_url),
@@ -284,11 +331,11 @@ def update_job_fit_rating(
 
 def store_analysis(analysis: Analysis, db_path: Path) -> int:
     """Store an analysis result to the analyses table.
-    
+
     Args:
         analysis: Analysis model instance to store
         db_path: Path to the SQLite database
-        
+
     Returns:
         Database ID of the inserted analysis
     """
@@ -300,3 +347,70 @@ def store_analysis(analysis: Analysis, db_path: Path) -> int:
         )
         conn.commit()
         return cursor.lastrowid
+
+
+def clear_all_jobs(db_path: Path) -> int:
+    """Delete all jobs from the database.
+
+    Also clears all analysis records since they reference jobs.
+
+    Args:
+        db_path: Path to the SQLite database
+
+    Returns:
+        Number of jobs deleted
+    """
+    with _db_connection(db_path) as (conn, cursor):
+        cursor.execute("DELETE FROM analyses")
+        cursor.execute("DELETE FROM jobs")
+        conn.commit()
+        return cursor.rowcount
+
+
+def reset_jobs_for_analysis(db_path: Path, status: str = "new") -> int:
+    """Reset jobs for re-analysis by clearing fit_rating and analyzed_at.
+
+    Args:
+        db_path: Path to the SQLite database
+        status: Status to set for reset jobs (default 'new')
+
+    Returns:
+        Number of jobs reset
+    """
+    with _db_connection(db_path) as (conn, cursor):
+        cursor.execute(
+            """UPDATE jobs
+               SET fit_rating = NULL, analyzed_at = NULL, status = ?
+               WHERE fit_rating IS NOT NULL""",
+            (status,),
+        )
+        conn.commit()
+        return cursor.rowcount
+
+
+def get_job_count(db_path: Path) -> int:
+    """Get total count of jobs in the database.
+
+    Args:
+        db_path: Path to the SQLite database
+
+    Returns:
+        Total number of jobs
+    """
+    with _db_connection(db_path) as (conn, cursor):
+        cursor.execute("SELECT COUNT(*) FROM jobs")
+        return cursor.fetchone()[0]
+
+
+def get_analyzed_count(db_path: Path) -> int:
+    """Get count of analyzed jobs (jobs with fit_rating).
+
+    Args:
+        db_path: Path to the SQLite database
+
+    Returns:
+        Number of analyzed jobs
+    """
+    with _db_connection(db_path) as (conn, cursor):
+        cursor.execute("SELECT COUNT(*) FROM jobs WHERE fit_rating IS NOT NULL")
+        return cursor.fetchone()[0]

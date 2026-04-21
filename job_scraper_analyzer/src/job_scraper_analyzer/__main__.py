@@ -1,14 +1,16 @@
 """CLI entry point for job_scraper_analyzer."""
 
+import os
+import sys
+import termios
+import tty
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.table import Table
 
-from job_scraper_analyzer import analyzer, cv_parser, database, scraper
-from job_scraper_analyzer.models import Analysis, Job
+from job_scraper_analyzer import analyzer, database, scraper
 
 # Default database path
 DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "job-scraper-analyzer" / "jobs.db"
@@ -19,6 +21,19 @@ app = typer.Typer(
 )
 console = Console()
 
+def _get_char() -> str:
+    """Get a single character without requiring Enter."""
+    try:
+        fd = sys.stdin.fileno()
+    except OSError:
+        return sys.stdin.read(1) if hasattr(sys.stdin, "read") else ""
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
 
 def _ensure_db_path(db_path: Optional[Path] = None) -> Path:
     """Ensure database path exists, create parent directories if needed."""
@@ -31,126 +46,280 @@ def _ensure_db_path(db_path: Optional[Path] = None) -> Path:
 @app.command()
 def fetch(
     search_terms_file: str = typer.Option(..., "--search-terms", help="Path to search terms file"),
-    location: str = typer.Option("Remote", "--location", help="Job location"),
+    location: str = typer.Option("South Africa", "--location", help="Job location"),
     is_remote: bool = typer.Option(True, "--remote/--no-remote", help="Remote job filter"),
     hours_old: int = typer.Option(168, "--hours-old", help="Jobs from last N hours"),
+    max_jobs: int = typer.Option(100, "--max-jobs", help="Maximum total jobs to fetch across all sites"),
+    linkedin_cookies: Optional[str] = typer.Option(None, "--linkedin-cookies", help="LinkedIn session cookies (li_at) for fetching descriptions"),
     db_path: Optional[Path] = typer.Option(None, "--db", help="Database path"),
+    company_denylist: Optional[str] = typer.Option(None, "--denylist", help="Comma-separated list of companies to exclude (or path to .denylist.txt file)"),
 ) -> None:
     """Fetch jobs from job boards."""
     db_path = _ensure_db_path(db_path)
-    
+
     # Initialize database
     database.init_db(db_path)
-    
+
     # Read search terms file
     search_terms_path = Path(search_terms_file)
     if not search_terms_path.exists():
         typer.echo(f"Error: Search terms file not found: {search_terms_file}")
         raise typer.Exit(1)
-    
+
     search_terms = search_terms_path.read_text().strip().split("\n")
     search_terms = [term.strip() for term in search_terms if term.strip()]
-    
+
     if not search_terms:
         typer.echo("No search terms found in file.")
         return
-    
+
+    # Use provided cookies or fall back to environment variable
+    if linkedin_cookies is None:
+        linkedin_cookies = os.environ.get("LINKEDIN_COOKIES")
+
+    # Parse company denylist
+    deny_companies: set = set()
+    if company_denylist:
+        deny_path = Path(company_denylist)
+        if deny_path.exists() and deny_path.is_file():
+            # Load from file (one company per line)
+            deny_companies = {c.strip().lower() for c in deny_path.read_text().split("\n") if c.strip()}
+            typer.echo(f"Loaded {len(deny_companies)} companies from denylist file: {deny_path}")
+        else:
+            # Treat as comma-separated list
+            deny_companies = {c.strip().lower() for c in company_denylist.split(",") if c.strip()}
+    else:
+        # Check for default denylist file in current directory
+        default_deny_path = Path("company.denylist.txt")
+        if default_deny_path.exists():
+            deny_companies = {c.strip().lower() for c in default_deny_path.read_text().split("\n") if c.strip()}
+            typer.echo(f"Loaded {len(deny_companies)} companies from default denylist: {default_deny_path}")
+
     # Scrape jobs with all search terms combined (single scrape call)
     # The scraper will iterate through sites internally
-    all_jobs: List[Job] = []
+    total_fetched: int = 0
     seen_urls: set = set()  # Deduplicate by job_url
     for term in search_terms:
         typer.echo(f"Fetching jobs for: {term} in {location}...")
-        
-        # Scrape jobs from all sites
-        jobs = scraper.scrape_sites(term, location, is_remote, hours_old)
-        
-        # Only add jobs we haven't seen (deduplicate by URL)
+
+        # Use scrape_sites to get LinkedIn and Indeed jobs (50 per site per term)
+        # Note: Indeed has mutual exclusion between is_remote and hours_old,
+        # so we pass is_remote and filter by date_posted at review stage
+        jobs = scraper.scrape_sites(
+            search_term=term,
+            location=location,
+            is_remote=is_remote,
+            hours_old=hours_old,
+            linkedin_cookies=linkedin_cookies,
+            deny_companies=deny_companies,
+        )
+
+        # Store jobs incrementally and deduplicate (no max limit)
+        new_count = 0
         for job in jobs:
             if job.job_url not in seen_urls:
-                all_jobs.append(job)
+                database.upsert_job(job, db_path)
                 seen_urls.add(job.job_url)
-        
-        typer.echo(f"  Found {len(jobs)} jobs for '{term}'")
-    
-    # Store all jobs (one scrape call per term, upsert per job)
-    for job in all_jobs:
-        database.upsert_job(job, db_path)
-    
-    typer.echo(f"Total: {len(all_jobs)} jobs fetched and stored.")
+                new_count += 1
+                total_fetched += 1
+
+        typer.echo(f"  Found {new_count} new jobs for '{term}' (total: {total_fetched})")
+
+    typer.echo(f"Total: {total_fetched} jobs fetched and stored.")
 
 
 @app.command()
 def analyze(
-    batch_size: int = typer.Option(5, "--batch-size", help="Jobs per analysis batch"),
-    cv_path: str = typer.Option("W_Bisschoff_CV.tex", "--cv", help="Path to CV file"),
+    batch_size: int = typer.Option(10, "--batch-size", help="Jobs per analysis batch"),
+    max_jobs: Optional[int] = typer.Option(None, "--max-jobs", help="Maximum jobs to analyze (default: all unanalyzed)"),
+    cv_path: Optional[str] = typer.Option(None, "--cv", help="Path to CV file (default: resume-data/data.yaml)"),
     db_path: Optional[Path] = typer.Option(None, "--db", help="Database path"),
 ) -> None:
     """Analyze jobs with AI fit rating."""
     db_path = _ensure_db_path(db_path)
-    
-    # Parse CV for summary
-    cv_file = Path(cv_path)
-    if cv_file.exists():
-        cv_text = cv_parser.parse_latex_file(cv_file)
-        cv_summary = cv_parser.extract_cv_summary(cv_text)
+
+    # Use provided CV path or default to resume-data/data.yaml
+    if cv_path is None:
+        cv_path = Path(__file__).parent.parent.parent.parent / "resume-data" / "data.yaml"
     else:
-        cv_summary = "Senior Software Engineer with experience in Python, Full-stack development, and AI/ML."
+        cv_path = Path(cv_path)
+
+    # Read CV content directly (supports both YAML and LaTeX)
+    if cv_path.exists():
+        cv_text = cv_path.read_text(encoding="utf-8")
+        typer.echo(f"Using CV: {cv_path}")
+    else:
+        cv_text = "Senior Software Engineer with experience in Python, Full-stack development, and AI/ML."
         typer.echo(f"CV file not found at {cv_path}, using default summary.")
-    
+
     # Load jobs needing analysis
-    jobs = database.get_jobs_needing_analysis(limit=batch_size, db_path=db_path)
-    
+    jobs = database.get_jobs_needing_analysis(db_path=db_path) if max_jobs is None else database.get_jobs_needing_analysis(db_path=db_path, limit=max_jobs)
+
     if not jobs:
         typer.echo("No jobs to analyze.")
         return
-    
+
     typer.echo(f"Analyzing {len(jobs)} jobs with batch size: {batch_size}")
-    
+
     # Analyze jobs
-    analyses = analyzer.analyze_jobs(jobs, cv_summary, batch_size=batch_size, db_path=db_path)
-    
+    analyses = analyzer.analyze_jobs(jobs, cv_text, batch_size=batch_size, db_path=db_path)
+
     typer.echo(f"Analysis complete. {len(analyses)} jobs analyzed.")
 
 
 @app.command()
 def review(
     db_path: Optional[Path] = typer.Option(None, "--db", help="Database path"),
+    company_denylist: Optional[str] = typer.Option(None, "--denylist", help="Comma-separated list of companies to exclude (or path to .denylist.txt file)"),
 ) -> None:
-    """Review and manage job analysis results."""
+    """Review jobs one by one, starting with best matches first."""
     db_path = _ensure_db_path(db_path)
-    
-    # Load all jobs
-    jobs = database.get_jobs_by_status(status="new", db_path=db_path)
-    
+
+    # Parse company denylist (same logic as fetch)
+    deny_companies: set = set()
+    if company_denylist:
+        deny_path = Path(company_denylist)
+        if deny_path.exists() and deny_path.is_file():
+            deny_companies = {c.strip().lower() for c in deny_path.read_text().split("\n") if c.strip()}
+            typer.echo(f"Loaded {len(deny_companies)} companies from denylist file: {deny_path}")
+        else:
+            deny_companies = {c.strip().lower() for c in company_denylist.split(",") if c.strip()}
+    else:
+        # Check for default denylist file in current directory
+        default_deny_path = Path("company.denylist.txt")
+        if default_deny_path.exists():
+            deny_companies = {c.strip().lower() for c in default_deny_path.read_text().split("\n") if c.strip()}
+            typer.echo(f"Using {len(deny_companies)} companies from default denylist: {default_deny_path}")
+
+    # Load jobs needing review, sorted by fit_rating (best first)
+    jobs = database.get_jobs_needing_review(db_path)
+
+    # Filter out denied companies
+    if deny_companies:
+        original_count = len(jobs)
+        jobs = [j for j in jobs if not (j.company and j.company.lower() in deny_companies)]
+        filtered_count = original_count - len(jobs)
+        if filtered_count > 0:
+            typer.echo(f"Filtered out {filtered_count} jobs from denied companies.")
+
     if not jobs:
         console.print("[yellow]No jobs to review.[/yellow]")
         return
-    
-    # Create Rich table for display
-    table = Table(title="Job Applications")
-    table.add_column("ID", style="cyan", width=3)
-    table.add_column("Title", style="green")
-    table.add_column("Company", style="yellow")
-    table.add_column("Location", style="blue")
-    table.add_column("Fit", style="magenta", width=4)
-    table.add_column("Status", style="white")
-    
+
+    console.print(f"\n[cyan]Reviewing {len(jobs)} jobs (best matches first)[/cyan]\n")
+
+    reviewed = 0
+    applied = 0
+    declined = 0
+    skipped = 0
+
     for i, job in enumerate(jobs, 1):
-        fit_display = str(job.fit_rating) if job.fit_rating else "-"
-        table.add_row(
-            str(i),
-            job.title or "N/A",
-            job.company or "N/A",
-            job.location or "N/A",
-            fit_display,
-            job.status,
-        )
-    
-    console.print(table)
-    console.print("\n[cyan]Controls:[/cyan] a=applied, d=declined, s=skip, q=quit")
-    console.print("[dim]Use arrow keys to navigate, Enter to select action.[/dim]")
+        # Show job details
+        console.print(f"[bold green]--- Job {i}/{len(jobs)} ---[/bold green]")
+        console.print(f"[yellow]Title:[/yellow] {job.title or 'N/A'}")
+        console.print(f"[yellow]Company:[/yellow] {job.company or 'N/A'}")
+        console.print(f"[yellow]Location:[/yellow] {job.location or 'N/A'}")
+        console.print(f"[yellow]Fit Rating:[/yellow] {job.fit_rating if job.fit_rating else 'Not analyzed'}")
+        console.print(f"[yellow]Site:[/yellow] {job.site or 'N/A'}")
+        console.print(f"[yellow]Remote:[/yellow] {'Yes' if job.is_remote else 'No'}")
+        console.print(f"[yellow]Link:[/yellow] {job.job_url}")
+        console.print()
+
+        # Truncate description for display
+        desc = job.description or "No description available."
+        if len(desc) > 500:
+            desc = desc[:500] + "..."
+        console.print(f"[dim]Description:[/dim] {desc}")
+        console.print()
+
+        # Prompt for action
+        while True:
+            console.print("[cyan]Action:[/cyan] \\[a]pplied  \\[d]eclined  \\[s]kip  \\[q]uit: ", end="")
+            key = _get_char().lower()
+
+            if key == 'a':
+                database.update_job_status(job.job_url, "applied", db_path)
+                applied += 1
+                reviewed += 1
+                console.print("[green]Marked as applied.[/green]")
+                break
+            elif key == 'd':
+                database.update_job_status(job.job_url, "declined", db_path)
+                declined += 1
+                reviewed += 1
+                console.print("[red]Marked as declined.[/red]")
+                break
+            elif key == 's':
+                # Skip - leave status as 'new' so it's picked up next time
+                skipped += 1
+                console.print("[dim]Skipped.[/dim]")
+                break
+            elif key == 'q':
+                console.print("\n[cyan]Review session ended.[/cyan]")
+                console.print(f"Reviewed: {reviewed} | Applied: {applied} | Declined: {declined} | Skipped: {skipped}")
+                return
+            else:
+                console.print("[red]Invalid key. Use a, d, s, or q.[/red]")
+
+        console.print()
+
+    console.print("[bold green]Review complete![/bold green]")
+    console.print(f"Reviewed: {reviewed} | Applied: {applied} | Declined: {declined} | Skipped: {skipped}")
+
+
+@app.command()
+def clear(
+    mode: str = typer.Argument(..., help="Clear mode: 'jobs' to delete all jobs, 'reset' to reset for re-analysis"),
+    db_path: Optional[Path] = typer.Option(None, "--db", help="Database path"),
+    force: bool = typer.Option(False, "--force", help="Skip confirmation prompt"),
+) -> None:
+    """Clear jobs or reset for re-analysis.
+
+    Modes:
+        jobs    - Delete all jobs and analyses from database
+        reset   - Reset fit ratings to re-analyze all jobs
+    """
+    db_path = _ensure_db_path(db_path)
+    database.init_db(db_path)
+
+    if mode == "jobs":
+        job_count = database.get_job_count(db_path)
+        if job_count == 0:
+            typer.echo("No jobs to clear.")
+            return
+
+        if not force:
+            confirm = typer.prompt(f"This will delete {job_count} jobs and all analyses. Continue? (y/N)")
+            if confirm.lower() != "y":
+                typer.echo("Aborted.")
+                return
+
+        deleted = database.clear_all_jobs(db_path)
+        typer.echo(f"Cleared {deleted} jobs and all analyses.")
+
+    elif mode == "reset":
+        analyzed_count = database.get_analyzed_count(db_path)
+        if analyzed_count == 0:
+            typer.echo("No analyzed jobs to reset.")
+            return
+
+        if not force:
+            confirm = typer.prompt(f"This will reset {analyzed_count} jobs for re-analysis. Continue? (y/N)")
+            if confirm.lower() != "y":
+                typer.echo("Aborted.")
+                return
+
+        reset = database.reset_jobs_for_analysis(db_path)
+        typer.echo(f"Reset {reset} jobs for re-analysis.")
+
+    else:
+        typer.echo(f"Unknown mode: {mode}. Use 'jobs' or 'reset'.")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        typer.echo("\nAborted by user.")
+        raise SystemExit(130)
