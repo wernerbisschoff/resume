@@ -319,68 +319,134 @@ def _build_analysis_prompt(job: Job, cv_summary: str) -> str:
     Returns:
         Formatted prompt string for droid exec
     """
-    prompt = f"""You are evaluating a job posting for fit with a candidate's profile. Provide a thorough, honest assessment.
+    prompt = f"""[DOMAIN]: JOB_SCREENING_CLASSIFICATION
+[PERSONA]: ELITE_TECHNICAL_RECRUITER
+[OBJECTIVE]: Algorithmic sourcing triage — maximize precision and recall for software engineering roles.
 
-## CANDIDATE PROFILE
-
+## [CV_SUMMARY]
 {cv_summary}
+[/CV_SUMMARY]
 
-## JOB TO ANALYZE
+## [LOCATION_CONSTRAINTS]
+- Ideal: Fully remote
+- Acceptable: Up to 2 days/week on-site in Cape Town, South Africa
+- Desperate Mode: More days in office in Cape Town acceptable if role is otherwise strong
 
+## [JOB_TO_ANALYZE]
 Title: {job.title}
 Company: {job.company or 'Not specified'}
 Location: {job.location or 'Not specified'}
 Remote: {'Yes' if job.is_remote else 'No'}
 Description: {job.description or 'No description available'}
+[/JOB_TO_ANALYZE]
 
 ---
 
-## EVALUATION CRITERIA
+## [STEP_1]: BINARY HARD FILTERS
+Evaluate EITHER condition → immediately halt and fail role if triggered.
 
-Evaluate the job based on the following dimensions:
+1. **NON-SOFTWARE**: Primary daily responsibility is NOT writing/architecting/testing code (pure IT, hardware, manual QA, project management, sales engineering without dev).
 
-### 1. ROLE TYPE FIT (Software Engineering Focus)
-- Does this role involve software engineering work (backend, frontend, full-stack, embedded, DevOps, AI/ML, etc.)?
-- Is it a clear software engineering position or tangential (e.g., pure IT support, sales engineering without development)?
-- Weight heavily toward roles that involve actual software development.
-
-### 2. SENIORITY/EXPERIENCE LEVEL MATCH
-Evaluate the experience requirements against the candidate's profile:
-- **Duration alignment**: Compare job required duration (e.g., "3+ years") with candidate's actual experience (5+ years total). Is the candidate underqualified (job wants more experience) or overqualified (candidate is a senior who would be bored)?
-- **Project complexity match**: Does the job's implied project complexity align with the candidate's demonstrated project depth? For example, embedded real-time systems vs. simple CRUD apps have very different complexity profiles.
-- **Leadership/mentorship expectations**: Does the job expect senior-level responsibilities (managing others, architecture decisions) that may or may not align?
-- **Not just years, but depth**: 5 years of shallow web dev ≠ 5 years of embedded systems + backend + AI integration. Evaluate the TYPE of experience.
-
-### 3. TECHNICAL STACK OVERLAP
-- Map the job's required/implied technologies against the candidate's skills
-- Consider not just exact matches but adjacent transferable skills (e.g., Python ↔ Elixir, C++ ↔ embedded Rust, etc.)
-- Identify hard gaps (required tech candidate doesn't have) vs. soft gaps (can be learned quickly)
-
-### 4. DOMAIN EXPERTISE
-- Does the job's domain (fintech, healthcare, embedded, AI, etc.) align with candidate's experience?
-- Are there domain-specific requirements that would be difficult to meet?
-
-### 5. CULTURE & WORK STYLE
-- Remote/hybrid preferences match?
-- Company size and team structure alignment?
-- Engineering culture (startup chaos vs. established processes)?
-
-### 6. CONTRACT TYPE & LOCATION
-- Permanent vs. contract alignment with candidate's preferences
-- Location constraints (remote preferred, willing to do max 2 days/week on-site in Cape Town)
+If EITHER triggers → composite_fit_rating = 1, rejection_trigger_if_any = "<reason>".
 
 ---
 
-## RESPONSE FORMAT
+## [STEP_2]: MULTI-DIMENSIONAL ANALYSIS
+If passing Step 1, evaluate:
 
-Rate the fit as one of:
-- **Perfect (4)**: Strong alignment on role type, experience level, and technical stack. Candidate would likely be excited and qualified.
-- **Good (3)**: Reasonable fit with minor gaps. Candidate could succeed with some ramp-up.
-- **Marginal (2)**: Significant gaps in experience level, technical stack, or domain. Would require substantial adaptation.
-- **No Fit (1)**: Wrong role type, vastly over/underqualified, or fundamental mismatches.
+1. **Seniority & Depth**: Role complexity vs candidate capability (5+ years cross-disciplinary: Embedded C++ + Full-stack Python/TS + Agentic workflows). Not years, depth.
+2. **Technical Stack Overlap**:
+   - Core Matches: Python, React, SQL, C++, AWS (direct alignment)
+   - Strategic Adjacencies: Elixir↔Phoenix, Cap'n Proto↔gRPC (transferable)
+   - Hard Gaps: Mandatory tech missing with high learning curve
+3. **Location & Work Style**: Remote preference weighted highest; 1-2 days hybrid acceptable; more days in Cape Town acceptable only in desperate mode and if role is otherwise strong.
 
-Respond in JSON format:
-{{"fit_rating": <1-4>, "justification": "<2-3 sentence justification explaining your assessment on the key dimensions above>"}}
+---
+
+## [STEP_3]: OUTPUT FORMULATION
+Generate `analytical_scratchpad` BEFORE `triage_rating`. Rating MUST derive from analysis.
+
+```json
+{{
+  "binary_filters": {{
+    "is_software_engineering": true/false,
+    "rejection_trigger_if_any": "N/A or <reason>"
+  }},
+  "analytical_scratchpad": {{
+    "seniority_match_critique": "<2-sentence role complexity vs candidate capability>",
+    "stack_overlap_critique": "<explicit enumeration: exact matches, soft gaps, hard gaps>",
+    "workstyle_critique": "<remote/hybrid/in-office preference alignment>"
+  }},
+  "scoring_matrix": {{
+    "seniority_score": 1-5,
+    "stack_score": 1-5,
+    "workstyle_score": 1-5
+  }},
+  "triage_rating": 0-3,
+  "actionable_justification": "<2-sentence synthesis including downstream action>"
+}}
+```
+
+**CRITICAL**: Generate scratchpad fields BEFORE triage_rating. Do NOT reverse order.
+
+---
+
+## [EDGE_CASE_HANDLING]
+- CV_SUMMARY empty → use generic senior engineer profile with 5+ years multi-stack experience.
+- Job description missing/empty → lean toward evaluation based on title; if title is ambiguous/empty, mark is_software_engineering=false, rejection_trigger_if_any="No job description provided".
+- Location field absent → evaluate based on "Remote" flag if present; if both absent, proceed with evaluation without workstyle penalty.
+- "Hybrid" keyword without percentage → weight as negative signal for workstyle_score but not exclusion.
+
+---
+
+## [TRIAGE_SCALE]
+Use this action-driven scale:
+
+| Rating | Class | Downstream Action |
+|--------|-------|-------------------|
+| 0 | EXCLUDE | Discard immediately. Fails binary filter (non-software) or banned tech. |
+| 1 | BACKLOG | Viable software role but high learning curves or low stack alignment. Queue for bulk automation applications. |
+| 2 | STANDARD | Strong core tech + seniority alignment. Standard application queue with base resume template. |
+| 3 | PRIORITY | High-velocity match across all domains. Requires manually tailored cover letter or custom resume. |
+
+**Scoring Rules:**
+- triage_rating 0 (EXCLUDE): Fails binary filter (is_software_engineering=false) or fundamental tech mismatch.
+- triage_rating 1 (BACKLOG): Passes binary filter but scoring_matrix average < 3 OR multiple hard gaps.
+- triage_rating 2 (STANDARD): scoring_matrix average ≥ 3 with no hard gaps; workstyle_score can be lower.
+- triage_rating 3 (PRIORITY): scoring_matrix average ≥ 4 across all dimensions with strong stack overlap.
+
+---
+
+## [EXAMPLE]
+Input:
+```
+Title: Senior Python Backend Engineer
+Company: TechFin
+Location: Cape Town (Hybrid)
+Description: Build ML pipelines with Python/FastAPI. 5+ years exp with distributed systems. AWS required.
+```
+
+Output:
+```json
+{{
+  "binary_filters": {{
+    "is_software_engineering": true,
+    "rejection_trigger_if_any": "N/A"
+  }},
+  "analytical_scratchpad": {{
+    "seniority_match_critique": "Role demands 5+ years distributed systems — candidate's cross-disciplinary depth covers this with embedded C++ and backend Python experience.",
+    "stack_overlap_critique": "Core Match: Python, FastAPI, AWS. Strategic Adjacency: ML pipelines map to candidate's agentic workflows. No hard gaps identified.",
+    "workstyle_critique": "Hybrid in Cape Town is acceptable under desperate mode; remote preference slightly penalized."
+  }},
+  "scoring_matrix": {{
+    "seniority_score": 4,
+    "stack_score": 5,
+    "workstyle_score": 3
+  }},
+  "triage_rating": 3,
+  "actionable_justification": "High-velocity match with Python stack, AWS, and ML pipeline domain alignment. PRIORITY queue for tailored cover letter."
+}}
+```
 """
     return prompt
 
@@ -401,13 +467,12 @@ def _parse_droid_response(response: str) -> Tuple[int, str]:
     # Try to extract JSON from response
     response = response.strip()
 
-    # Handle text ratings like "Perfect", "Good", etc.
+    # Handle text ratings like "EXCLUDE", "BACKLOG", "STANDARD", "PRIORITY" or numeric 0-3
     text_rating_map = {
-        "perfect": 4,
-        "good": 3,
-        "marginal": 2,
-        "no fit": 1,
-        "no_fit": 1,
+        "exclude": 0,
+        "backlog": 1,
+        "standard": 2,
+        "priority": 3,
     }
 
     # First try to parse as JSON
@@ -420,14 +485,19 @@ def _parse_droid_response(response: str) -> Tuple[int, str]:
             json_str = response[json_start:json_end]
             data = json.loads(json_str)
 
-            fit_rating = data.get("fit_rating")
-            justification = data.get("justification") or ""
+            # Support both old format (fit_rating/composite_fit_rating) and new format (triage_rating)
+            # Use explicit None checks because 0 is falsy in Python
+            triage = data.get("triage_rating")
+            composite = data.get("composite_fit_rating")
+            legacy = data.get("fit_rating")
+            fit_rating = triage if triage is not None else (composite if composite is not None else legacy)
+            justification = data.get("actionable_justification") or data.get("justification") or ""
 
             # Handle missing fit_rating
             if fit_rating is None:
-                raise ValueError("fit_rating not found in response")
+                raise ValueError("triage_rating not found in response")
 
-            # Handle text rating in JSON
+            # Handle text rating in JSON (e.g., "EXCLUDE", "PRIORITY")
             if isinstance(fit_rating, str):
                 fit_rating_lower = fit_rating.lower().strip()
                 if fit_rating_lower in text_rating_map:
@@ -437,8 +507,8 @@ def _parse_droid_response(response: str) -> Tuple[int, str]:
 
             fit_rating = int(fit_rating)
 
-            if fit_rating not in [1, 2, 3, 4]:
-                raise ValueError(f"fit_rating must be 1-4, got: {fit_rating}")
+            if fit_rating not in [0, 1, 2, 3]:
+                raise ValueError(f"triage_rating must be 0-3, got: {fit_rating}")
 
             return fit_rating, justification
     except json.JSONDecodeError:
@@ -451,7 +521,7 @@ def _parse_droid_response(response: str) -> Tuple[int, str]:
     for text, rating in text_rating_map.items():
         if text in response_lower:
             # Extract justification after the rating text
-            parts = response.split(str(rating) if isinstance(rating, int) else text, 1)
+            parts = response.split(text, 1)
             if len(parts) > 1:
                 justification = parts[1].strip()
                 # Clean up common prefixes

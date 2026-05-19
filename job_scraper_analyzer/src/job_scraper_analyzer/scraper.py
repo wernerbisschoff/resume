@@ -1,9 +1,12 @@
 """JobSpy scraper wrapper with intersection strategy for filter limitations."""
 
+import json
 import random
+import re
 import time
+import urllib.request
 from datetime import date, datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from job_scraper_analyzer.models import Job
 
@@ -503,3 +506,125 @@ def intersection_strategy(
         pass
 
     return all_jobs
+
+
+def _parse_arc_timestamp(ts: int) -> Optional[date]:
+    """Parse Arc postedAt Unix timestamp to date."""
+    try:
+        return date.fromtimestamp(ts)
+    except (ValueError, OSError):
+        return None
+
+
+def _build_arc_url(url_string: str) -> str:
+    """Build full Arc job URL from urlString."""
+    return f"https://arc.dev/remote-jobs/{url_string}"
+
+
+def _map_job_type(arc_type: Optional[str]) -> Optional[Literal["fulltime", "parttime", "contract", "internship", "temporary"]]:
+    """Map Arc jobType to our job_type enum."""
+    mapping = {
+        "fulltime": "fulltime",
+        "parttime": "parttime",
+        "contract": "contract",
+        "freelance": "contract",
+        "internship": "internship",
+        "temporary": "temporary",
+    }
+    if arc_type:
+        return mapping.get(arc_type.lower())
+    return None
+
+
+def scrape_arc(
+    location: Optional[str] = None,
+    experience_level: Optional[str] = None,
+    job_type: Optional[str] = None,
+    deny_companies: Optional[set] = None,
+) -> List[Job]:
+    """Scrape jobs from Arc's public remote jobs board.
+
+    Args:
+        location: Location filter (e.g. "South Africa", "Worldwide", "Germany")
+        experience_level: Experience level filter (e.g. "senior", "mid", "junior", "lead")
+        job_type: Job type filter (e.g. "fulltime", "parttime", "contract", "freelance")
+        deny_companies: Set of company names to exclude (lowercase)
+
+    Returns:
+        List of Job objects from Arc
+    """
+    jobs: List[Job] = []
+    seen_urls: set = set()
+    deny_set = deny_companies or set()
+
+    # Build query params
+    params = []
+    if location:
+        params.append(f"location={location.replace(' ', '+')}")
+    if experience_level:
+        params.append(f"experienceLevel={experience_level}")
+    if job_type:
+        params.append(f"jobType={job_type}")
+
+    query_string = "&".join(params)
+    url = "https://arc.dev/remote-jobs" + ("?" + query_string if query_string else "")
+
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as response:
+            html = response.read().decode("utf-8")
+
+        # Extract __NEXT_DATA__ JSON from the page
+        match = re.search(r'__NEXT_DATA__" type="application/json"[^>]*>(.*?)</script>', html, re.DOTALL)
+        if not match:
+            return []
+
+        data = json.loads(match.group(1))
+        arc_jobs = data.get("props", {}).get("pageProps", {}).get("arcJobs", [])
+        if not arc_jobs:
+            return []
+
+        for arc_job in arc_jobs:
+            try:
+                # Build job URL
+                url_string = arc_job.get("urlString", "")
+                job_url = _build_arc_url(url_string) if url_string else ""
+
+                # Get company name
+                company_data = arc_job.get("company", {})
+                company = company_data.get("name") if isinstance(company_data, dict) else None
+
+                # Check denylist
+                if company and company.lower() in deny_set:
+                    continue
+
+                # Map job type
+                mapped_job_type = _map_job_type(arc_job.get("jobType"))
+
+                job = Job(
+                    job_url=job_url,
+                    site="arc",
+                    title=arc_job.get("title", ""),
+                    company=company,
+                    location=location or "Worldwide",
+                    is_remote=True,
+                    job_type=mapped_job_type,
+                    description=None,  # Arc doesn't expose description in list view
+                    min_salary=None,
+                    max_salary=None,
+                    salary_currency="USD",
+                    salary_interval="hourly",
+                    date_posted=_parse_arc_timestamp(arc_job.get("postedAt")),
+                    job_level=arc_job.get("experienceLevel"),
+                    company_industry=None,
+                )
+                if job_url and job_url not in seen_urls:
+                    jobs.append(job)
+                    seen_urls.add(job_url)
+            except Exception:
+                continue
+
+    except Exception:
+        pass
+
+    return jobs

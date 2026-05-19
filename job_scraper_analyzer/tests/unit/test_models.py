@@ -70,7 +70,7 @@ class TestJobModel:
             date_posted=date(2024, 1, 15),
             job_level="Senior",
             company_industry="Technology",
-            fit_rating=4,
+            fit_rating=3,
             status="new",
         )
         
@@ -89,7 +89,7 @@ class TestJobModel:
         assert job.date_posted == date(2024, 1, 15)
         assert job.job_level == "Senior"
         assert job.company_industry == "Technology"
-        assert job.fit_rating == 4
+        assert job.fit_rating == 3
         assert job.status == "new"
 
     def test_job_model_optional_fields_default_to_none(self) -> None:
@@ -135,9 +135,9 @@ class TestJobModel:
     def test_job_model_fit_rating_accepts_integer(self) -> None:
         """Test that fit_rating accepts integer values 1-4.
         
-        RED: fit_rating should accept 1 (No Fit) to 4 (Perfect).
+        RED: fit_rating should accept 0 (EXCLUDE) to 3 (PRIORITY).
         """
-        for rating in [1, 2, 3, 4]:
+        for rating in [0, 1, 2, 3]:
             job = Job(
                 job_url=f"https://linkedin.com/jobs/view/{rating}",
                 site="linkedin",
@@ -255,7 +255,7 @@ class TestSearchModel:
         
         RED: location defaults to None, is_remote defaults to False,
         hours_old defaults to None, job_type defaults to None,
-        site_name defaults to 'linkedin,indeed,google'.
+        site_name defaults to 'linkedin,indeed,google,arc'.
         """
         search = Search(search_term="Data Scientist")
         
@@ -264,7 +264,7 @@ class TestSearchModel:
         assert search.is_remote is False
         assert search.hours_old is None
         assert search.job_type is None
-        assert search.site_name == "linkedin,indeed,google"
+        assert search.site_name == "linkedin,indeed,google,arc"
 
     def test_search_model_accepts_all_fields(self) -> None:
         """Test that Search model accepts all defined fields.
@@ -298,13 +298,13 @@ class TestAnalysisModel:
         """
         analysis = Analysis(
             job_id=1,
-            fit_rating=4,
-            justification="Perfect match for skills",
+            fit_rating=3,
+            justification="Priority match for skills",
         )
         
         assert analysis.job_id == 1
-        assert analysis.fit_rating == 4
-        assert analysis.justification == "Perfect match for skills"
+        assert analysis.fit_rating == 3
+        assert analysis.justification == "Priority match for skills"
 
     def test_analysis_model_defaults(self) -> None:
         """Test that Analysis model has correct defaults.
@@ -313,21 +313,21 @@ class TestAnalysisModel:
         """
         analysis = Analysis(
             job_id=1,
-            fit_rating=3,
-            justification="Good match",
+            fit_rating=2,
+            justification="Standard match",
         )
         
         assert analysis.job_id == 1
-        assert analysis.fit_rating == 3
-        assert analysis.justification == "Good match"
+        assert analysis.fit_rating == 2
+        assert analysis.justification == "Standard match"
         assert analysis.batch_id is None
 
     def test_analysis_model_fit_rating_range(self) -> None:
-        """Test that fit_rating accepts values 1-4.
+        """Test that fit_rating accepts values 0-3.
         
-        RED: fit_rating must accept integers 1-4.
+        RED: fit_rating must accept integers 0-3 (EXCLUDE, BACKLOG, STANDARD, PRIORITY).
         """
-        for rating in [1, 2, 3, 4]:
+        for rating in [0, 1, 2, 3]:
             analysis = Analysis(
                 job_id=rating,
                 fit_rating=rating,
@@ -342,8 +342,8 @@ class TestAnalysisModel:
         """
         analysis = Analysis(
             job_id=1,
-            fit_rating=4,
-            justification="Perfect match",
+            fit_rating=3,
+            justification="Priority match",
             batch_id="batch-2024-06-01-001",
         )
         

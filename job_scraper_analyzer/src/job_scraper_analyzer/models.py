@@ -10,7 +10,7 @@ class Job(BaseModel):
     """Job posting entity with scraped data and analysis results."""
 
     job_url: str
-    site: Literal["linkedin", "indeed", "google"]
+    site: Literal["linkedin", "indeed", "google", "arc"]
     title: str
     company: Optional[str] = None
     location: Optional[str] = None
@@ -24,7 +24,7 @@ class Job(BaseModel):
     date_posted: Optional[date] = None
     job_level: Optional[str] = None
     company_industry: Optional[str] = None
-    fit_rating: Optional[Literal[1, 2, 3, 4]] = None
+    fit_rating: Optional[Literal[0, 1, 2, 3]] = None
     status: Literal["new", "applied", "declined", "skip"] = "new"
     search_id: Optional[int] = None
     scraped_at: Optional[datetime] = None
@@ -47,7 +47,7 @@ class Search(BaseModel):
     is_remote: bool = False
     hours_old: Optional[int] = None
     job_type: Optional[str] = None
-    site_name: str = "linkedin,indeed,google"
+    site_name: str = "linkedin,indeed,google,arc"
 
 
 class Analysis(BaseModel):
@@ -55,5 +55,5 @@ class Analysis(BaseModel):
 
     job_id: int
     batch_id: Optional[str] = None
-    fit_rating: Literal[1, 2, 3, 4]
+    fit_rating: Literal[0, 1, 2, 3]
     justification: str

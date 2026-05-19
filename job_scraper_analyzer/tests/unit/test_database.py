@@ -275,7 +275,7 @@ class TestUpsertJob:
             job_url="https://linkedin.com/jobs/view/789",
             site="linkedin",
             title="Engineer",
-            fit_rating=4,
+            fit_rating=0,
             status="applied",  # Already applied
         )
         
@@ -326,7 +326,7 @@ class TestUpsertJob:
             date_posted=date(2024, 5, 15),
             job_level="Senior",
             company_industry="Technology",
-            fit_rating=3,
+            fit_rating=0,
             status="new",
             search_id=1,
             scraped_at=now,
@@ -348,7 +348,7 @@ class TestUpsertJob:
         assert row["title"] == "Full Stack Developer"
         assert row["company"] == "Big Tech Inc"
         assert row["is_remote"] == 1  # Boolean stored as integer
-        assert row["fit_rating"] == 3
+        assert row["fit_rating"] == 0
         assert row["status"] == "new"
 
 
@@ -439,9 +439,9 @@ class TestGetJobsNeedingAnalysis:
         jobs = [
             Job(job_url="https://linkedin.com/jobs/a1", site="linkedin", title="Job A1", fit_rating=None),  # Needs analysis
             Job(job_url="https://linkedin.com/jobs/a2", site="linkedin", title="Job A2", fit_rating=None),  # Needs analysis
-            Job(job_url="https://linkedin.com/jobs/a3", site="linkedin", title="Job A3", fit_rating=3),      # Analyzed
+            Job(job_url="https://linkedin.com/jobs/a3", site="linkedin", title="Job A3", fit_rating=0),      # Analyzed
             Job(job_url="https://linkedin.com/jobs/a4", site="linkedin", title="Job A4", fit_rating=None),  # Needs analysis
-            Job(job_url="https://linkedin.com/jobs/a5", site="linkedin", title="Job A5", fit_rating=1),    # Analyzed
+            Job(job_url="https://linkedin.com/jobs/a5", site="linkedin", title="Job A5", fit_rating=0),    # Analyzed
         ]
         
         for job in jobs:
@@ -492,8 +492,8 @@ class TestGetJobsNeedingAnalysis:
         
         # All jobs have fit_rating
         jobs = [
-            Job(job_url="https://linkedin.com/jobs/b1", site="linkedin", title="Job B1", fit_rating=4),
-            Job(job_url="https://linkedin.com/jobs/b2", site="linkedin", title="Job B2", fit_rating=3),
+            Job(job_url="https://linkedin.com/jobs/b1", site="linkedin", title="Job B1", fit_rating=0),
+            Job(job_url="https://linkedin.com/jobs/b2", site="linkedin", title="Job B2", fit_rating=0),
         ]
         
         for job in jobs:

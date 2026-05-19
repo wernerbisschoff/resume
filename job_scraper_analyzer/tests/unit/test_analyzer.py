@@ -62,7 +62,7 @@ class TestAnalyzeJobs:
             # Configure mock to return a successful response
             mock_run.return_value = MagicMock(
                 returncode=0,
-                stdout='{"fit_rating": 4, "justification": "Perfect match for Python role"}',
+                stdout='{"triage_rating": 3, "justification": "Priority match for Python role"}',
                 stderr=""
             )
             
@@ -92,7 +92,7 @@ class TestAnalyzeJobs:
         with patch("job_scraper_analyzer.analyzer.subprocess.run") as mock_run:
             # Batch mode: single call returns JSON array with all results
             mock_responses = [
-                '{"fit_rating": 4, "justification": "Perfect match for Python role"}\n{"fit_rating": 3, "justification": "Good match for full stack"}\n{"fit_rating": 2, "justification": "Marginal fit for embedded"}',
+                '{"triage_rating": 3, "justification": "Priority match for Python role"}\n{"triage_rating": 2, "justification": "Standard match for full stack"}\n{"triage_rating": 1, "justification": "Backlog fit for embedded"}',
             ]
             mock_run.side_effect = [
                 MagicMock(returncode=0, stdout=resp, stderr="")
@@ -160,7 +160,7 @@ class TestAnalyzeJobs:
                 # Batch mode: single call returns JSON array with all results
                 mock_run.return_value = MagicMock(
                     returncode=0,
-                    stdout='{"fit_rating": 4, "justification": "Perfect match"}\n{"fit_rating": 3, "justification": "Good match"}\n{"fit_rating": 2, "justification": "Marginal fit"}',
+                    stdout='{"triage_rating": 3, "justification": "Priority match"}\n{"triage_rating": 2, "justification": "Standard match"}\n{"triage_rating": 1, "justification": "Backlog fit"}',
                     stderr=""
                 )
                 
@@ -226,8 +226,8 @@ class TestBuildAnalysisPrompt:
         
         assert "fit" in prompt.lower(), "Prompt should mention fit rating"
         # The rating options should be present
-        assert any(opt in prompt for opt in ["Perfect", "Good", "Marginal", "No Fit"]), \
-            "Prompt should include rating options"
+        assert any(opt in prompt for opt in ["EXCLUDE", "BACKLOG", "STANDARD", "PRIORITY", "0", "1", "2", "3"]), \
+            "Prompt should include triage rating options"
 
 
 class TestParseDroidResponse:
@@ -236,73 +236,73 @@ class TestParseDroidResponse:
     def test_parse_fit_rating_from_response_json(self) -> None:
         """Test parsing JSON response from droid exec.
         
-        RED: _parse_droid_response() should extract fit_rating (1-4) and justification.
+        RED: _parse_droid_response() should extract triage_rating (0-3) and justification.
         """
-        response = '{"fit_rating": 4, "justification": "Perfect match for skills"}'
+        response = '{"triage_rating": 3, "justification": "Priority match for skills"}'
         
         from job_scraper_analyzer.analyzer import _parse_droid_response
         
         fit_rating, justification = _parse_droid_response(response)
         
-        assert isinstance(fit_rating, int), "fit_rating should be an integer"
-        assert fit_rating in [1, 2, 3, 4], "fit_rating should be between 1 and 4"
-        assert justification == "Perfect match for skills", "justification should be extracted"
+        assert isinstance(fit_rating, int), "triage_rating should be an integer"
+        assert fit_rating in [0, 1, 2, 3], "triage_rating should be between 0 and 3"
+        assert justification == "Priority match for skills", "justification should be extracted"
 
     def test_parse_fit_rating_good(self) -> None:
-        """Test parsing a 'Good' fit rating response.
+        """Test parsing a STANDARD triage rating response.
         
-        RED: fit_rating should be 3 for 'Good' rating.
+        RED: triage_rating should be 2 for STANDARD.
         """
-        response = '{"fit_rating": 3, "justification": "Good match for the role"}'
+        response = '{"triage_rating": 2, "justification": "Standard match for the role"}'
         
         from job_scraper_analyzer.analyzer import _parse_droid_response
         
         fit_rating, justification = _parse_droid_response(response)
         
-        assert fit_rating == 3, "fit_rating 3 corresponds to 'Good'"
-        assert "Good match" in justification
+        assert fit_rating == 2, "triage_rating 2 corresponds to STANDARD"
+        assert "Standard match" in justification
 
     def test_parse_fit_rating_marginal(self) -> None:
-        """Test parsing a 'Marginal' fit rating response.
+        """Test parsing a BACKLOG triage rating response.
         
-        RED: fit_rating should be 2 for 'Marginal' rating.
+        RED: triage_rating should be 1 for BACKLOG.
         """
-        response = '{"fit_rating": 2, "justification": "Partial overlap with skills"}'
+        response = '{"triage_rating": 1, "justification": "Backlog - partial overlap with skills"}'
         
         from job_scraper_analyzer.analyzer import _parse_droid_response
         
         fit_rating, justification = _parse_droid_response(response)
         
-        assert fit_rating == 2, "fit_rating 2 corresponds to 'Marginal'"
-        assert "Partial overlap" in justification
+        assert fit_rating == 1, "triage_rating 1 corresponds to BACKLOG"
+        assert "partial overlap" in justification
 
     def test_parse_fit_rating_no_fit(self) -> None:
-        """Test parsing a 'No Fit' fit rating response.
+        """Test parsing an EXCLUDE triage rating response.
         
-        RED: fit_rating should be 1 for 'No Fit' rating.
+        RED: triage_rating should be 0 for EXCLUDE.
         """
-        response = '{"fit_rating": 1, "justification": "Significant mismatch"}'
+        response = '{"triage_rating": 0, "justification": "Exclude - significant mismatch"}'
         
         from job_scraper_analyzer.analyzer import _parse_droid_response
         
         fit_rating, justification = _parse_droid_response(response)
         
-        assert fit_rating == 1, "fit_rating 1 corresponds to 'No Fit'"
+        assert fit_rating == 0, "triage_rating 0 corresponds to EXCLUDE"
         assert "mismatch" in justification.lower()
 
     def test_parse_droid_response_handles_text_ratings(self) -> None:
-        """Test parsing responses where fit_rating is specified as text.
+        """Test parsing responses where triage_rating is specified as text.
         
-        RED: Should handle responses like "Perfect" -> 4, "Good" -> 3, etc.
+        RED: Should handle responses like "PRIORITY" -> 3, "STANDARD" -> 2, etc.
         """
         # Response with text rating instead of number
-        response = '{"fit_rating": "Perfect", "justification": "Ideal match"}'
+        response = '{"triage_rating": "PRIORITY", "justification": "Ideal match"}'
         
         from job_scraper_analyzer.analyzer import _parse_droid_response
         
         fit_rating, justification = _parse_droid_response(response)
         
-        assert fit_rating == 4, "Text 'Perfect' should map to fit_rating 4"
+        assert fit_rating == 3, "Text 'PRIORITY' should map to triage_rating 3"
         assert "Ideal match" in justification
 
 
@@ -378,7 +378,7 @@ class TestAnalyzerEdgeCases:
                 MagicMock(returncode=429, stdout="", stderr="Rate limited"),
                 MagicMock(
                     returncode=0,
-                    stdout='{"fit_rating": 3, "justification": "Good"}',
+                    stdout='{"triage_rating": 2, "justification": "Standard"}',
                     stderr=""
                 ),
             ]
@@ -412,7 +412,7 @@ class TestAnalyzerEdgeCases:
         with patch("job_scraper_analyzer.analyzer.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
                 returncode=0,
-                stdout='{"fit_rating": 4, "justification": "Perfect"}',
+                stdout='{"triage_rating": 3, "justification": "Priority"}',
                 stderr=""
             )
             

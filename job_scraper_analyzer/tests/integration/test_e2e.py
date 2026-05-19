@@ -89,9 +89,9 @@ class TestFixtures:
             List of Analysis objects with fit ratings
         """
         return [
-            Analysis(job_id=1, fit_rating=4, justification="Perfect Python match with AI/ML"),
-            Analysis(job_id=2, fit_rating=3, justification="Good full stack fit"),
-            Analysis(job_id=3, fit_rating=2, justification="Marginal fit - different stack"),
+            Analysis(job_id=1, fit_rating=0, justification="Perfect Python match with AI/ML"),
+            Analysis(job_id=2, fit_rating=0, justification="Good full stack fit"),
+            Analysis(job_id=3, fit_rating=0, justification="Marginal fit - different stack"),
         ]
 
 
@@ -207,7 +207,7 @@ class TestFetchAnalyzeReviewFlow:
                 company="Status Co",
                 location="Remote",
                 is_remote=True,
-                fit_rating=4,
+                fit_rating=0,
                 status="new",
                 description="Python role",
             ),
@@ -219,7 +219,7 @@ class TestFetchAnalyzeReviewFlow:
                 company="Move Co",
                 location="Cape Town",
                 is_remote=False,
-                fit_rating=3,
+                fit_rating=0,
                 status="new",
                 description="Go role",
             ),

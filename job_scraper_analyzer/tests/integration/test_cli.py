@@ -183,8 +183,8 @@ class TestAnalyzeCommand:
         mock_jobs = self.setup_mock_jobs()
         
         mock_analyses = [
-            Analysis(job_id=1, fit_rating=4, justification="Perfect Python match"),
-            Analysis(job_id=2, fit_rating=3, justification="Good full stack fit"),
+            Analysis(job_id=1, fit_rating=0, justification="Perfect Python match"),
+            Analysis(job_id=2, fit_rating=0, justification="Good full stack fit"),
         ]
         
         with patch("job_scraper_analyzer.database.get_jobs_needing_analysis") as mock_get_jobs, \
