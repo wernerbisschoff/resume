@@ -5,7 +5,7 @@
 
 ### Tasks
 
-- [ ] T001: Create content/data.typ — Centralized Data Dictionary
+- [x] T001: Create content/data.typ — Centralized Data Dictionary
   - **Type**: Migration
   - **Mode**: IMMEDIATE
   - **Verification**: `typst check content/data.typ`
