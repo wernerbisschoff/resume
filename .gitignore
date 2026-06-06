@@ -1,7 +1,6 @@
-.git
 build/
 *.synctex.gz
-.DS_STORE
+
 
 # Logs
 logs
