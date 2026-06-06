@@ -30,7 +30,7 @@
 
 ### Tasks
 
-- [ ] T002: Create lib/template.typ — Pure Layout Engine
+- [x] T002: Create lib/template.typ — Pure Layout Engine
   - **Type**: Feature_Batch
   - **Mode**: IMMEDIATE
   - **Verification**: `typst fmt --check lib/template.typ && typst check lib/template.typ`
