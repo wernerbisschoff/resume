@@ -16,14 +16,17 @@
         [Applied systems thinking to solve community management challenges through software solutions.],
       ),
       embedded: (
-        [Integrated CRDT synchronization layer (y_ex) for real-time modifications; actor-based buffering with sub-50ms sync latency.],
-        [Designed dynamic BEAM supervision tree with :one_for_one strategy ensuring 99.9% fault isolation.],
-        [Implemented threshold-based buffer flush and heap hibernation (hibernate_after), reducing memory footprint by ~60%.],
+        [Integrated a CRDT synchronization layer (y_ex) to handle real-time modifications; implemented an actor-based buffering model that reduced state-sync latency to sub-50ms thresholds.],
+        [Designed a dynamic BEAM supervision tree with a :one_for_one strategy to isolate concurrent page editing instances, ensuring 99.9% fault isolation and zero system-wide cascading crashes.],
+        [Implemented a threshold-based buffer flush and scheduled heap hibernation (hibernate_after), reducing process memory footprints by ~60% under active network I/O concurrency.],
+        [Applied Monotropic focus principles and Universal Design to minimize user information processing overhead and ensure highly predictable, deterministic information layout.],
       ),
       enterprise: (
-        [Implemented PostgreSQL Row-Level Security (RLS) and SET LOCAL transaction-scoped context injection for multi-tenant isolation.],
-        [Designed atomic asynchronous flush strategy using in-memory GenServer buffers, reducing database writes by 85%.],
-        [Utilized Ecto.Multi atomic chains and Oban transactional workers for safe multi-stage backend edits.],
+        [Engineered and hosted an enterprise-grade documentation ecosystem.],
+        [Implemented a single-database multi-tenant separation engine using PostgreSQL Row-Level Security (RLS) and transaction-scoped local parameters (SET LOCAL), enforcing strict data silos across isolated groups.],
+        [Designed an atomic asynchronous flush strategy using in-memory GenServer storage buffers, reducing database persistent write transactions by 85% during periods of high user interaction.],
+        [Utilized Ecto.Multi atomic chains and Oban transactional background workers to ensure multi-stage backend edits (e.g., structural document renaming and incoming backlink indexing) execute completely or roll back safely.],
+        [Applied Universal Design and Executive Functioning support models to product UX/UI; established highly structured, low-context asynchronous operational playbooks that minimized cognitive friction for contributors.],
       ),
     ),
   ),
@@ -40,13 +43,16 @@
     variant_tags: ("general", "embedded", "enterprise"),
     description: (
       general: (
-        [Extended ERPNext (Python/JS) to improve workflows, pricing logic, and operational reporting (SQL) → reduced manual reporting time.],
-        [Built Expo mobile app with NFC (ISO 14443-4 APDUs) for e-paper price tags → enabled real-time price updates.],
+        [Extended ERPNext using Python/JavaScript to improve workflows, pricing logic, and operational reporting (SQL) → reduced manual reporting time and improved data accuracy.],
+        [Built mobile application in Expo, including NFC (ISO 14443-4 APDUs) for e-paper price tags and card operations → enabled real-time price updates with fewer tagging errors.],
+        [Migrated internal mobile Retool workflows to Expo → improved performance and enhanced long-term maintainability.],
         [Provisioned AWS infrastructure with Pulumi; deployed Inngest and PayloadCMS services.],
-        [Introduced LLM-assisted development workflows → improved debugging speed and code review throughput.],
+        [Diagnosed and resolved issues in a large existing ERPNext installation.],
+        [Introduced LLM-assisted development workflows → improved debugging speed and code review throughput, enabling faster iteration.],
       ),
       embedded: (
-        [Designed ISO 14443-4 NFC communication architectures for e-paper display nodes and card reader matrices.],
+        [Designed ISO 14443-4 NFC communication architectures for e-paper display nodes and secure card reader matrices.],
+        [Engineered lock-free asynchronous device management services bridging hardware peripherals with application layers.],
         [Built Python-based hardware peripheral simulators to catch edge-case device state corruptions prior to flashing.],
         [Introduced LLM-assisted development workflows to improve debugging speed and code review throughput.],
       ),
@@ -55,6 +61,7 @@
         [Architected migration of internal Retool workflows to Expo/React Native, reducing vendor licensing overhead.],
         [Built custom NFC scanner utilities within Expo for instantaneous physical inventory syncs.],
         [Provisioned AWS infrastructure with Pulumi, deploying Inngest event-driven functions and PayloadCMS.],
+        [Diagnosed and resolved issues in a large existing ERPNext installation; introduced LLM-assisted debugging workflows.],
       ),
     ),
   ),
@@ -72,16 +79,17 @@
     description: (
       general: (
         [Designed event-driven FSM for I2C-based embedded system (C++/FreeRTOS) → maintainable architecture, fewer bugs.],
-        [Developed ESP32 applications (C/C++, ESP-IDF) with configurable BLE stack and FOTA updates.],
-        [Built Python tooling for serial/BLE communication and hardware mocks → accelerated testing workflows.],
+        [Developed ESP32 applications (C/C++, ESP-IDF) with configurable BLE stack, TinyFrame protocol, and FOTA updates.],
+        [Built Python tooling for serial/BLE communication, hardware mocks, and Pytest async workflows → accelerated testing.],
+        [Developed active object within QP Real-Time Embedded Framework (QSPY) to simulate device behaviour.],
       ),
       embedded: (
         [Architected deterministic FSMs on dual-core ESP32 using FreeRTOS for concurrent sensor arrays.],
         [Developed Cap'n Proto IPC over serial lines, achieving sub-millisecond serialization latency.],
       ),
       enterprise: (
-        [Built modular Python utilities and automation scripts for internal configuration schema validation.],
-        [Designed data handling pipelines ensuring transfer consistency across runtime platforms.],
+        [Built modular Python utility structures and automation scripts for internal configuration schema validation.],
+        [Designed data handling pipelines ensuring data transfer consistency across runtime platforms using declarative specifications.],
         [Developed Python hardware mocks enabling faster development cycles with fewer hardware dependencies.],
       ),
     ),
@@ -120,13 +128,13 @@
     variant_tags: ("general", "embedded", "enterprise"),
     description: (
       general: (
-        [Lectured Python and C++ programming for first-year IT students (remote and in-person).],
+        [Lectured Python and C++ programming for Introduction to Programming for first year IT students in both remote and in-person settings.],
       ),
       embedded: (
-        [Lectured Python and C++ programming for first-year IT students.],
+        [Lectured Python and C++ programming for Introduction to Programming for first year IT students.],
       ),
       enterprise: (
-        [Lectured Python and C++ programming for first-year IT students.],
+        [Lectured Python and C++ programming for Introduction to Programming for first year IT students.],
       ),
     ),
   ),
@@ -247,6 +255,9 @@
   email: "werner@bisschoff.dev",
   phone: "071 826 2066",
   location: "Cape Town, Western Cape, South Africa",
+  github: "wbisschoff13",
+  website: "https://werner.bisschoff.dev",
+  linkedin: "wbisschoff13",
   position: (
     general: "Software Engineer",
     embedded: "Embedded Systems & Real-Time Software Engineer",

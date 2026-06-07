@@ -15,8 +15,7 @@ original LaTeX awesome-cv templates (commit `4020c57`). Each CV variant
 - **Dates:** Jul 2025 – Present
 
 #### General bullets
-- Founded and facilitate a neurodivergent-focused peer community, managing event operations and a WhatsApp-based community.
-- Conflict resolution and management in a neurodiverse context.
+- Founded neurodivergent-focused peer community; manage event operations and WhatsApp-based community platform.
 - Applied systems thinking to solve community management challenges through software solutions.
 
 #### Embedded bullets
@@ -125,7 +124,7 @@ original LaTeX awesome-cv templates (commit `4020c57`). Each CV variant
 - **Dates:** Feb 2020 – Dec 2020
 
 #### General / Embedded / Enterprise
-- Lecturing Python and C++ programming for Introduction to Programming for first year IT students in both remote and in-person settings
+- Lectured Python and C++ programming for Introduction to Programming for first year IT students in both remote and in-person settings
 
 ---
 
