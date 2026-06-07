@@ -25,7 +25,7 @@
     - **Edge Cases**: If `star-stories.md` contains stories with no `id` field, generate a slug from the story title using the convention `^[a-z0-9-]+$` from the data model; if a story already exists in YAML by content match, skip the duplicate
     - **Acceptance**: Both legacy `.md` files are removed from git tracking, `star-stories.yaml` contains 100% of the STAR story data, `mise run check` passes, `typst fmt --check` passes, and `git grep` returns zero matches for either deleted filename in `.typ` sources
 
-- [ ] T002: CI Pipeline and Build Determinism Verification
+- [x] T002: CI Pipeline and Build Determinism Verification
   - **Type**: Config
   - **Mode**: IMMEDIATE
   - **Verification**: `grep -rn "http://\|https://" content/*.yaml lib/*.typ || echo "no network refs" && grep -A5 "matrix:" .github/workflows/release.yml | grep -q "cv.typ" && mise run check`
