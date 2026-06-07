@@ -52,8 +52,8 @@ As a maintainer, I need the Typst CV generation to be fully automated via GitHub
 ### Static Verification
 
 - `find . -name "*.tex" -o -name "*.cls" | wc -l` — must return `0` (no `.tex` or `.cls` files anywhere, including `example/`)
-- `test -f docker/Dockerfile || test -f docker/build.sh` — must return non-zero (neither file exists)
-- `test -d .devcontainer || test -d .vscode` — must return non-zero (neither directory exists)
+- `test ! -f docker/Dockerfile && test ! -f docker/build.sh` — must return zero (neither file exists)
+- `test ! -d .devcontainer && test ! -d .vscode` — must return zero (neither directory exists)
 - `grep "\.typst/" .gitignore` — must return a match (Typst cache pattern present)
 - `grep "typst-community/setup-typst@v5" .github/workflows/release.yml` — must return a match
 

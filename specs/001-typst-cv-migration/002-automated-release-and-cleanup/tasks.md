@@ -8,7 +8,7 @@
 - [x] T001: Remove all legacy LaTeX artifacts and dev configurations
   - **Type**: Migration
   - **Mode**: IMMEDIATE
-  - **Verification**: `find . -name "*.tex" -o -name "*.cls" | wc -l | xargs test 0 -eq && test ! -f docker/Dockerfile && test ! -d .devcontainer && test ! -d .vscode && mise run check`
+  - **Verification**: `[ $(find . -name "*.tex" -o -name "*.cls" | wc -l) -eq 0 ] && test ! -f docker/Dockerfile && test ! -f docker/build.sh && test ! -d .devcontainer && test ! -d .vscode && mise run check`
   - **Estimated Time**: 45 minutes
   - **Files**:
     - `W_Bisschoff_CV.tex`
