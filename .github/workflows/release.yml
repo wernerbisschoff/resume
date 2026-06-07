@@ -26,6 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install yamllint
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq yamllint
+
+      - name: Validate YAML files
+        run: yamllint content/*.yaml
+
       - name: Install fonts
         run: |
           mkdir -p ~/.fonts

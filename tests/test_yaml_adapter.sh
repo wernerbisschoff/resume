@@ -26,8 +26,6 @@ ENTRY_POINTS=(
   cv.typ
   cv_systems.typ
   cv_infrastructure.typ
-  cv_embedded.typ
-  cv_enterprise.typ
   cover_letter.typ
 )
 

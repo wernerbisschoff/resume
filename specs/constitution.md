@@ -1,6 +1,6 @@
 # Project Constitution
 
-**Version:** 0.2.0
+**Version:** 0.3.0
 
 ---
 
@@ -30,30 +30,29 @@
 - **Trigger**: Git tag push (semver `v*` or calver `YYYY.MM*`)
 
 ### Tooling
-- **Language**: Typst (latest stable)
-- **Formatter**: `typst fmt --check`
-- **Type Checker**: `typst check`
+- **Language**: Typst 0.14.2 (pinned via `.mise.toml`)
+- **YAML Validator**: `yamllint` (run via `mise run check-yaml`)
 - **Compiler**: `typst compile`
+- **Task Runner**: `mise` (orchestrates compile, lint, test)
 
 ## Testing Protocols
 ### Framework
-- `TEST_FRAMEWORK`: typst
-- `TEST_ROOT`: none
-- `TEST_EXT`: none
-- `TEST_COMMAND`: typst compile {entry}.typ {entry}.pdf
-- `LINT_COMMAND`: typst fmt --check
+- `TEST_FRAMEWORK`: Shell (bash) + Typst compile check
+- `TEST_ROOT`: tests/
+- `TEST_EXT`: .sh
+- `TEST_COMMAND`: mise run test
+- `LINT_COMMAND`: mise run check-yaml
 
 ### Coverage
 - No coverage framework applicable (static document generation)
 - Compilation success is the primary test
-- `typst check` must pass on all `.typ` files
-- `typst fmt --check` must pass to ensure consistent code style
+- `yamllint content/*.yaml` must pass with no errors (warnings tolerated)
+- `mise run check` must pass — validates YAML and compiles all entry points
 
 ## Definition of Done
 - [ ] Code implemented per functional requirements
 - [ ] `typst compile` succeeds on all variant entry points
-- [ ] `typst check` passes on all `.typ` files
-- [ ] `typst fmt --check` passes
+- [ ] `mise run check` passes
 - [ ] PDF output is single-column with `ligatures: false`
 - [ ] CI pipeline compiles and releases all variants on tag push
 - [ ] All LaTeX artifacts removed (unless flagged for user decision)
@@ -62,3 +61,4 @@
 ## Version History
 - 0.1.0 — Initial constitution from Typst CV Migration (explore/design/prd)
 - 0.2.0 — Replaced YAML ban with YAML canonical data source; updated Data/Presentation Separation to reference `content/*.yaml`
+- 0.3.0 — Updated tooling for Typst 0.14.2 (removed `typst fmt --check`/`typst check` which are unavailable); replaced with `yamllint` + `mise run check`

@@ -10,7 +10,6 @@
 )
 
 #let variant_data = cv_data + (
-  position: "Hybrid Edge/Systems Engineer",
   experience: filtered_experience,
   skills: filtered_skills,
 )

@@ -25,9 +25,13 @@ run = "typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter
 description = "Validate all documents compile without errors"
 run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf"
 
+[tasks.check-yaml]
+description = "Validate YAML files"
+run = "yamllint content/*.yaml"
+
 [tasks.check]
-description = "Run all verification checks (compile)"
-depends = ["check-compile"]
+description = "Run all verification checks (compile + YAML validation)"
+depends = ["check-yaml", "check-compile"]
 
 [tasks.check-compile]
 description = "Verify all documents compile without errors"

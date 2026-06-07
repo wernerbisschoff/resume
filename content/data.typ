@@ -5,7 +5,7 @@
 #let _projects = yaml("projects.yaml")
 #let _star_stories = yaml("star-stories.yaml")
 
-#let _variants = ("general", "systems", "infrastructure", "embedded", "enterprise")
+#let _variants = ("general", "systems", "infrastructure")
 
 #let _star_map = {
   let m = (:)
