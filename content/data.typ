@@ -21,11 +21,9 @@
         [Designed a dynamic BEAM supervision tree with one_for_one isolation, encapsulating each page editing session in its own process subtree to prevent cascading failures and guarantee per-session state integrity.],
       ),
       infrastructure: (
-        [Engineered and hosted an enterprise-grade documentation ecosystem.],
         [Implemented a single-database multi-tenant separation engine using PostgreSQL Row-Level Security (RLS) and transaction-scoped local parameters (SET LOCAL), enforcing strict data silos across isolated groups.],
         [Designed an atomic asynchronous flush strategy using in-memory GenServer storage buffers, reducing database persistent write transactions by 85% during periods of high user interaction.],
         [Utilized Ecto.Multi atomic chains and Oban transactional background workers to ensure multi-stage backend edits (e.g., structural document renaming and incoming backlink indexing) execute completely or roll back safely.],
-        [Applied Universal Design and Executive Functioning support models to product UX/UI; established highly structured, low-context asynchronous operational playbooks that minimized cognitive friction for contributors.],
       ),
     ),
   ),
@@ -58,7 +56,6 @@
       infrastructure: (
         [Refactored and extended ERPNext via Python and JavaScript server hooks, optimizing pricing matrices and BI reporting.],
         [Architected migration of internal Retool workflows to Expo/React Native, reducing vendor licensing overhead.],
-        [Built custom NFC scanner utilities within Expo for instantaneous physical inventory syncs.],
         [Provisioned and maintained a secure virtualized Linux infrastructure environment using Docker Compose for container isolation and writing custom backup and monitoring scripts.],
         [Diagnosed and resolved issues in a large existing ERPNext installation; introduced LLM-assisted debugging workflows.],
       ),
@@ -87,7 +84,6 @@
         [Developed Cap'n Proto IPC over serial lines, achieving sub-millisecond serialization latency.],
       ),
       infrastructure: (
-        [Built modular Python utility structures and automation scripts for internal configuration schema validation.],
         [Designed data handling pipelines ensuring data transfer consistency across runtime platforms using declarative specifications.],
         [Developed Python hardware mocks enabling faster development cycles with fewer hardware dependencies.],
       ),
@@ -97,20 +93,25 @@
     role: (
       general: "Software Developer",
       systems: "Software Developer",
+      infrastructure: "Infrastructure & Tooling Developer",
     ),
     company: "UMAN Technologies",
     location: "Cape Town",
     start_date: "Mar 2021",
     end_date: "Dec 2022",
-    variant_tags: ("general", "systems"),
+    variant_tags: ("general", "systems", "infrastructure"),
     description: (
       general: (
         [Implemented SOME/IP RPC services; optimized performance bottlenecks with perf.],
         [Built IPC/RPC layers (C++/Python) using Cap'n Proto; led small team using Agile practices.],
       ),
       systems: (
-        [Implemented RPC services using SOME/IP protocol; reduced bottlenecks with perf.],
-        [Built IPC/RPC layers in C++ and Python using Cap'n Proto; designed node trees for IPC interface.],
+        [Used perf profiling and flamegraphs to trace a performance bottleneck to JSON serialization and verbose logging in a SOME/IP request handling loop. Eliminated unnecessary logging via config toggle reducing latency by approximately 80%, then drove an architecture redesign to phase out JSON entirely.],
+        [Sole owner of an IPC service layer — studied existing node schema, designed node structures and data contracts, and implemented the communication layer enabling the frontend to consume the service.],
+        [Built Python-based SOME/IP hardware mocks simulating request/response behavior; integrated into CI so automated tests ran without physical hardware.],
+      ),
+      infrastructure: (
+        [Proactively created a Docker development container replicating the exact hardware environment — including VLAN and networking configuration — reducing setup time from hours to under an hour and enabling remote teams to develop without physical hardware.],
       ),
     ),
   ),
