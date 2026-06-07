@@ -34,6 +34,13 @@ Primary Tool Execution API: `mise run <task>`
 - Compilation success is the primary test (no unit test framework)
 - Review generated PDFs visually for layout regressions
 
+## Content Master
+
+- `analysis/experience_master.md` is the canonical source of truth for all CV content
+- Any addition/change to CV content must also be made in `analysis/experience_master.md` — and vice versa
+- The CV may never contain content not present in the master list
+- Before editing `content/data.typ`, verify the master list is up to date first
+
 ## Constraints
 
 - **ATS Compatibility**: single-column layout, `ligatures: false` on `set text()`

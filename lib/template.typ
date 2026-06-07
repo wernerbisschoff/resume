@@ -1,6 +1,6 @@
 #set text(ligatures: false)
 
-#let _cv_fonts = ("Helvetica", "Libertinus Serif")
+#let _cv_fonts = ("Roboto", "Helvetica")
 
 #let _resolve(value, variant) = {
   if type(value) == dictionary and variant in value {
@@ -40,25 +40,24 @@
 }
 
 #let _section(title) = {
-  text(size: 12pt, weight: "bold", title)
-  line(length: 100%)
+  v(0.15cm)
+  text(size: 10.5pt, weight: "bold", title)
+  line(length: 100%, stroke: 0.4pt + rgb("#2c3e50"))
   v(0.1cm)
 }
 
 #let render_header(name, email, phone, location) = {
-  align(center, text(size: 18pt, weight: "bold", name))
-  align(center, text(size: 10pt)[
-    #email \
-    #phone \
-    #location
-  ])
-  v(0.4cm)
+  align(center)[
+    #text(size: 16pt, weight: "bold", name) \
+    #text(size: 9pt)[#email  ·  #phone  ·  #location]
+  ]
+  v(0.2cm)
 }
 
 #let render_summary(summary) = {
   _section("Professional Summary")
-  summary
-  v(0.25cm)
+  text(size: 9pt, summary)
+  v(0.1cm)
 }
 
 #let render_experience(entries) = {
@@ -67,16 +66,16 @@
     for entry in entries {
       grid(
         columns: (1fr, auto),
-        gutter: 0.2cm,
-        [#text(weight: "bold", entry.role) \ #if entry.location != none { entry.location }],
-        [#text(entry.company) \ #entry.start_date #if entry.end_date != none { [-- #entry.end_date] }],
+        gutter: 0.1cm,
+        text(size: 9.5pt)[#text(weight: "bold", entry.role) #if entry.location != none { [, #entry.location] }],
+        text(size: 9pt)[#entry.company  |  #entry.start_date#if entry.end_date != none { [ – #entry.end_date] }],
       )
-      v(0.05cm)
+      v(0.03cm)
       for desc in entry.description {
-        [- #desc]
-        v(0.05cm)
+        text(size: 9pt)[– #desc]
+        v(0.02cm)
       }
-      v(0.2cm)
+      v(0.12cm)
     }
   }
 }
@@ -87,28 +86,33 @@
     for entry in entries {
       grid(
         columns: (1fr, auto),
-        gutter: 0.2cm,
-        [#text(weight: "bold", entry.degree) \ #entry.location],
-        [#text(entry.institution) \ #entry.graduation_year],
+        gutter: 0.1cm,
+        text(size: 9.5pt)[#text(weight: "bold", entry.degree)],
+        text(size: 9pt)[#entry.institution  |  #entry.graduation_year],
       )
-      v(0.05cm)
-      for detail in entry.details {
-        [- #detail]
-        v(0.05cm)
+      v(0.03cm)
+      if entry.details.len() > 0 {
+        text(size: 9pt)[#entry.details.join(" · ")]
       }
-      v(0.2cm)
+      v(0.1cm)
     }
   }
 }
 
-#let render_skills(categories) = {
-  if categories.len() > 0 {
-    _section("Skills")
-    for cat in categories {
-      [#cat.category_name: #cat.skills.join(", ")]
-      v(0.05cm)
-    }
-    v(0.25cm)
+#let render_skills(categories, variant) = {
+  let filtered = categories.filter(cat => cat.variant == variant)
+  if filtered.len() > 0 {
+    _section("Technical Application Scope")
+    grid(
+      columns: (auto, 1fr),
+      column-gutter: 0.2cm,
+      row-gutter: 0.2cm,
+      ..filtered.map(cat => (
+        text(size: 9pt, weight: "medium", cat.category_name),
+        text(size: 9pt, cat.skills.join(" | ")),
+      )).flatten()
+    )
+    v(0.1cm)
   }
 }
 
@@ -116,13 +120,13 @@
   if entries.len() > 0 {
     _section("Projects")
     for entry in entries {
-      text(weight: "bold", entry.name)
-      v(0.05cm)
+      text(size: 9.5pt, weight: "bold", entry.name)
+      v(0.02cm)
       for desc in entry.description {
-        [- #desc]
-        v(0.05cm)
+        text(size: 9pt)[– #desc]
+        v(0.02cm)
       }
-      v(0.2cm)
+      v(0.1cm)
     }
   }
 }
@@ -131,32 +135,32 @@
   if content != none {
     _section("AI Policy")
     for item in content {
-      item
-      v(0.05cm)
+      text(size: 9pt, item)
+      v(0.02cm)
     }
-    v(0.25cm)
+    v(0.1cm)
   }
 }
 
 #let render_job_target(content) = {
   if content != none {
     _section("Job Target")
-    content
-    v(0.25cm)
+    text(size: 9pt, content)
+    v(0.1cm)
   }
 }
 
 #let render_cv(data, variant: "general") = {
   set page(
     paper: "a4",
-    margin: (top: 1.5cm, bottom: 1.5cm, left: 2cm, right: 2cm),
+    margin: (top: 1.2cm, bottom: 1.2cm, left: 1.5cm, right: 1.5cm),
   )
   set text(
     font: _cv_fonts,
     ligatures: false,
-    size: 10pt,
+    size: 9.5pt,
   )
-  set par(justify: true, leading: 0.65em)
+  set par(justify: true, leading: 0.45em)
 
   let name = _resolve(data.at("name", default: ""), variant)
   let email = _resolve(data.at("email", default: ""), variant)
@@ -182,16 +186,13 @@
 
   render_header(name, email, phone, location)
   if position != none {
-    align(center, text(size: 11pt, weight: "bold", position))
-    v(0.3cm)
+    align(center, text(size: 10pt, weight: "bold", position))
+    v(0.15cm)
   }
   if summary != none { render_summary(summary) }
   render_experience(entries)
+  render_skills(skills, variant)
   render_education(education)
-  render_skills(skills)
-  render_projects(projects)
-  render_ai_policy(ai_policy)
-  render_job_target(job_target)
 }
 
 #let render_cover_letter(data, variant: "general") = {
