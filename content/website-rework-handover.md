@@ -1,8 +1,31 @@
 # Website Rework — Content Handover
 
-> **Source:** Analysis of werner.bisschoff.dev (current) vs. CV master-list + STAR stories (content/star-stories.md)
+> **Source:** Analysis of werner.bisschoff.dev (current) vs. CV YAML content layer + STAR stories
 > **Goal:** Transform the site from a general portfolio into a STAR-driven, impact-rich narrative.
-> **Date:** 2026-06-07
+> **Date:** 2026-06-07 (updated 2026-06-07 — YAML content layer)
+
+---
+
+## Data Architecture Change: YAML Content Layer (Live)
+
+The resume content has been migrated to a **YAML-based canonical content layer** at `resume/content/`. The website should consume these YAML files directly instead of hardcoding data in Astro pages.
+
+**Canonical data sources** (at `resume/content/`):
+
+| File | Content |
+|------|---------|
+| `config.yaml` | Personal info, title per variant, contact, 3-variant summaries, AI policy, job target, certification, cover letter sections |
+| `experience.yaml` | 5 roles (Divergent Tabletop, FARO, Ingenics, UMAN, NWU) with variant-tagged bullets, `website_show`, `cv_priority`, `star_ref` cross-refs |
+| `star-stories.yaml` | 14 STAR stories in full Amazon LP format with `star_ref` IDs |
+| `skills.yaml` | Skills by category per variant — `category` + `items` + `variant` |
+| `projects.yaml` | Project entries with technologies, `website_show` flags |
+| `education.yaml` | Education entry |
+
+**Integration strategy:**
+- Place YAML files at `website/src/data/resume-data/` (symlink from resume `content/` or copy in CI)
+- Each `.astro` page imports YAML via `js-yaml` or Astro's built-in YAML support — no more hardcoded `const experiences` blocks
+- `website_show: true` filters what appears on the site (unconstrained by CV page limits)
+- `star_ref` links experience bullets to full STAR narratives for case study expansion
 
 ---
 
@@ -70,7 +93,7 @@ The current site has 4 pillars (Build Safety Nets, Remove Friction, Design for M
 - AI-augmented methodology with guardrails
 
 ### 7. Cover Letter / About Me Positioning
-The cover letter data in data.typ has strong positioning text that could be adapted for the site:
+The cover letter data is in `content/config.yaml` (the `cover_letter` section with `about_me`, `why_me`, `how_i_work` per variant). Strong angles from the CV:
 - "Bridging hardware, full-stack development, and resilient system architecture"
 - "Deep technical expertise with a rigorous, AI-augmented methodology"
 - "I don't just write code; I design systems that last"
@@ -78,6 +101,13 @@ The cover letter data in data.typ has strong positioning text that could be adap
 ---
 
 ## Suggested Rework Plan (Priority Order)
+
+### Phase 0: YAML Data Integration
+0. Symlink or copy `resume/content/*.yaml` → `website/src/data/resume-data/`
+   - Astro can import YAML directly with `import` or via `js-yaml`
+   - Replace hardcoded `const experiences` / `const skillCategories` in `resume.astro` and `work.astro` with YAML imports
+   - Filter by `website_show: true` (all entries show on site)
+   - This must come first — all subsequent phases consume the YAML layer
 
 ### Phase 1: Content Enrichment (No Structural Changes)
 1. Add metrics to existing case studies (pull from STAR stories)
@@ -119,10 +149,16 @@ The cover letter data in data.typ has strong positioning text that could be adap
 
 ## Reference Files in This Repo
 
+> **Note:** The canonical data has moved to YAML (see Data Architecture Change above). Legacy files preserved for reference.
+
 | File | Content |
 |------|---------|
-| `content/star-stories.md` | 14 full STAR stories in Amazon LP format |
-| `content/master-list.md` | Canonical experience entries with STAR cross-refs |
-| `content/data.typ` | Typst CV content (3 variants: general / systems / infrastructure) |
-| `amazon-lp-cheatsheet-draft.md` | LP-indexed story index with quick picks |
-| `W_Bisschoff_CV_infrastructure.pdf` | Example compiled CV PDF |
+| `content/config.yaml` | Personal info, titles, contact, summaries, AI policy, certification, cover letter |
+| `content/experience.yaml` | 5 roles with variant-tagged bullets, `website_show`, `cv_priority`, `star_ref` |
+| `content/star-stories.yaml` | 14 STAR stories in Amazon LP format with `star_ref` IDs |
+| `content/skills.yaml` | Skills by category, organized per variant |
+| `content/projects.yaml` | Project entries with technology lists |
+| `content/education.yaml` | Education entry |
+| `content/star-stories.md` | (Legacy) 14 full STAR stories — preserved |
+| `content/master-list.md` | (Legacy) Canonical experience entries — YAML replaces this |
+| `content/data.typ` | Typst CV content (3 variants) — now consumes from YAML via adapter |
