@@ -5,7 +5,7 @@
 
 ### Tasks
 
-- [ ] T001: Remove all legacy LaTeX artifacts and dev configurations
+- [x] T001: Remove all legacy LaTeX artifacts and dev configurations
   - **Type**: Migration
   - **Mode**: IMMEDIATE
   - **Verification**: `find . -name "*.tex" -o -name "*.cls" | wc -l | xargs test 0 -eq && test ! -f docker/Dockerfile && test ! -d .devcontainer && test ! -d .vscode && mise run check`
@@ -64,7 +64,7 @@
     - **Refactor**: Remove any LaTeX-related patterns from `.gitignore` that are no longer relevant (e.g., `*.aux`, `*.out`)
     - **Acceptance**: `find . -name "*.tex" -o -name "*.cls"` returns zero results; `mise run check` passes; no Typst source files affected
 
-- [ ] T002: Update .gitignore for Typst build artifact exclusion
+- [x] T002: Update .gitignore for Typst build artifact exclusion
   - **Type**: Config
   - **Mode**: IMMEDIATE
   - **Verification**: `grep "\.typst/" .gitignore && grep "cv.*\.pdf" .gitignore`
