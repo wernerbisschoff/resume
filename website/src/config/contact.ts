@@ -21,7 +21,8 @@ export const CONTACT_INFO = {
     'Embedded Systems',
     'System Architecture',
     'Spec-Driven Development',
-    'AI Agentic Workflows',
+    'AI-Assisted Workflows',
+    'Infrastructure Engineering',
     'Performance Optimization',
   ],
   availability: {
