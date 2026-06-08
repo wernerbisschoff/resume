@@ -59,7 +59,7 @@ export const getFaqSchema = (): object => {
         name: `Is ${CONTACT_INFO.name} available for contract or freelance work?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Yes — currently open to freelance, contract, part-time, and full-time opportunities. Based in ${CONTACT_INFO.location}, ${CONTACT_INFO.country}, available for remote work internationally. Specializes in embedded systems, backend services, and AI-assisted development workflows.`,
+          text: `Yes — currently open to freelance, contract, part-time, and full-time opportunities. Based in ${CONTACT_INFO.location}, ${CONTACT_INFO.country}, available for remote work internationally. Specializes in embedded systems, backend services, and infrastructure engineering with spec-driven development and AI-assisted workflows.`,
         },
       },
       {
@@ -75,7 +75,7 @@ export const getFaqSchema = (): object => {
         name: `What are ${CONTACT_INFO.name}'s key skills?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Specializes in AI-agentic workflows, spec-driven development, and resilient systems architecture. Expert in C/C++, Python, JavaScript/TypeScript, Elixir, embedded systems (ESP32, FreeRTOS, BLE), and cloud technologies (AWS, Docker).',
+          text: 'Specializes in embedded systems, infrastructure engineering, and spec-driven development with AI-assisted workflows. Expert in C/C++, Python, JavaScript/TypeScript, Elixir, embedded systems (ESP32, FreeRTOS, BLE), and cloud technologies (AWS, Docker).',
         },
       },
       {
