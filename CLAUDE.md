@@ -33,24 +33,45 @@ Content lives in `content/data.typ`; layout logic lives in `lib/template.typ`.
 
 Primary Tool Execution API: `mise run <task>`
 
+### CV (Typst)
+
 | Task | Description |
 |------|-------------|
 | `mise run build` | Compile all 4 documents to PDF |
-| `mise run check` | Run all verification checks (compile) |
+| `mise run check` | Run all verification checks (compile + YAML lint) |
 | `mise run check-compile` | Verify all documents compile without errors |
 | `mise run lint` | Validate syntax via compilation |
 | `mise run dev` | Watch general CV and recompile on changes |
 | `mise run dev-systems` | Watch systems CV variant |
 | `mise run dev-infrastructure` | Watch infrastructure CV variant |
 | `mise run clean` | Remove generated PDF artifacts |
-| `mise run setup` | Verify mise toolchain and typst version |
+
+### Website (Astro) — delegated from root
+
+| Task | Description |
+|------|-------------|
+| `mise run website-setup` | Install website dependencies (Node + pnpm) |
+| `mise run website-check` | Run all website validation checks |
+| `mise run website-build` | Build website for production |
+| `mise run website-lint` | Lint website source code |
+| `mise run website-fix` | Auto-fix website code issues |
+| `mise run website-clean` | Remove website build artifacts |
+| `mise run website-dev` | Start website development server |
+
+### Unified monorepo tasks
+
+| Task | Description |
+|------|-------------|
+| `mise run fix` | Run all checks for **both** CV and website |
+| `mise run build-all` | Build **both** CV PDFs and website for production |
+| `mise run setup` | Install all tools and dependencies for both projects |
 | `mise run hooks` | Install git hooks (pre-commit + pre-push) |
 | `mise run uninstall-hooks` | Remove git hooks |
 | `mise run help` | List all available tasks |
 
 ## Verification Loop
 
-- Run `mise run check` before any commit
+- Run `mise run fix` (or `mise run check` for CV-only) before any commit
 - Install git hooks via `mise run hooks` after cloning/setup
 - Compilation success is the primary test (no unit test framework)
 - Review generated PDFs visually for layout regressions

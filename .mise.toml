@@ -1,5 +1,6 @@
 [tools]
 typst = "0.14.2"
+node = "22.13.0"
 
 [tasks.build]
 description = "Compile all Typst documents to PDF"
@@ -58,8 +59,8 @@ description = "Remove generated PDF artifacts"
 run = "rm -f W_Bisschoff_CV.pdf W_Bisschoff_CV_systems.pdf W_Bisschoff_CV_infrastructure.pdf W_Bisschoff_Cover_Letter.pdf"
 
 [tasks.setup]
-description = "Verify mise toolchain, install hooks"
-run = "mise install && typst --version && mise run hooks"
+description = "Install all tools and dependencies for both projects"
+run = "mise install && pnpm --prefix website install && typst --version && mise run hooks"
 
 [tasks.hooks]
 description = "Install git hooks from .githooks/ into repo hooks directory"
@@ -86,3 +87,54 @@ run = "bash tests/test_yaml_adapter.sh"
 [tasks.help]
 description = "List available mise tasks"
 run = "mise tasks --no-header"
+
+# ──────────────────────────────────────────────
+# Website (Astro) delegation tasks
+# ──────────────────────────────────────────────
+
+[tasks.website-setup]
+description = "Install website dependencies (Node + pnpm)"
+dir = "website"
+run = "mise install && pnpm install"
+
+[tasks.website-check]
+description = "Run all website validation checks"
+dir = "website"
+run = "mise run check"
+
+[tasks.website-build]
+description = "Build website for production"
+dir = "website"
+run = "mise run build"
+
+[tasks.website-lint]
+description = "Lint website source code"
+dir = "website"
+run = "mise run lint"
+
+[tasks.website-fix]
+description = "Auto-fix website code issues"
+dir = "website"
+run = "mise run fix"
+
+[tasks.website-clean]
+description = "Remove website build artifacts"
+dir = "website"
+run = "mise run clean"
+
+[tasks.website-dev]
+description = "Start website development server"
+dir = "website"
+run = "mise run dev"
+
+# ──────────────────────────────────────────────
+# Unified monorepo tasks
+# ──────────────────────────────────────────────
+
+[tasks.fix]
+description = "Run all checks for both CV and website"
+depends = ["check", "website-check"]
+
+[tasks.build-all]
+description = "Build both CV PDFs and website for production"
+depends = ["build", "website-build"]
