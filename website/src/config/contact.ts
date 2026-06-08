@@ -8,7 +8,7 @@
 export const CONTACT_INFO = {
   // Personal details
   name: 'Werner Bisschoff',
-  jobTitle: 'Software Engineer',
+  jobTitle: 'Software Engineer — Available for Contract',
   location: 'Cape Town',
   country: 'South Africa',
 

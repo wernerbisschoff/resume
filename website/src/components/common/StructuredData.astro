@@ -14,7 +14,7 @@ const jsonLd = {
   '@type': 'Person',
   name: SITE?.name || 'Werner Bisschoff',
   url: SITE?.site || 'https://werner.bisschoff.dev',
-  jobTitle: 'Software Engineer — Available for Contract',
+  jobTitle: CONTACT_INFO.jobTitle,
   email: CONTACT_INFO.email,
   image: `${SITE?.site || 'https://werner.bisschoff.dev'}/images/werner-bisschoff-software-engineer.webp`,
   sameAs: [CONTACT_INFO.social.github.url, CONTACT_INFO.social.linkedin.url],

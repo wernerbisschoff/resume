@@ -16,7 +16,7 @@ export const getPersonSchema = (): object => {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: CONTACT_INFO.name,
-    jobTitle: `${CONTACT_INFO.jobTitle} — Available for Contract`,
+    jobTitle: CONTACT_INFO.jobTitle,
     url: CONTACT_INFO.siteUrl,
     address: {
       '@type': 'PostalAddress',
