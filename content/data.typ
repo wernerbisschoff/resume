@@ -38,7 +38,12 @@
 #let _bullets_for_variant(bullets, variant) = {
   let mp = _variant_cap(variant)
   bullets
-    .filter(b => b.at("variant", default: "") == variant and b.at("cv_priority", default: 3) <= mp)
+    .filter(b => {
+      let bv = b.at("variant", default: "")
+      let prio = b.at("cv_priority", default: 3)
+      let tag_match = bv == variant or bv == "shared"
+      tag_match and prio <= mp
+    })
     .map(b => (
       text: b.at("text", default: ""),
       star_story: _star_text(b.at("star_ref", default: none)),

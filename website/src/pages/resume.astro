@@ -53,27 +53,19 @@ interface EducationEntry {
   end_date: string;
 }
 
-// Build experience list: general variant bullets, filtered by website_show
+// Build experience list: all website_show bullets across all variants
 const websiteExperiences = (experiences as ExperienceEntry[]).map((exp) => {
   const title = exp.role?.general || Object.values(exp.role)[0];
   const period = `${exp.start_date} — ${exp.end_date || 'Present'}`;
-  const bullets = exp.bullets
-    .filter((b) => b.variant === 'general' && b.website_show !== false)
-    .sort((a, b) => a.cv_priority - b.cv_priority);
-
-  // Fallback: show all website_show bullets if no general variant
-  const description =
-    bullets.length > 0
-      ? bullets.map((b) => b.text)
-      : exp.bullets
-          .filter((b) => b.website_show !== false)
-          .sort((a, b) => a.cv_priority - b.cv_priority)
-          .map((b) => b.text);
+  const description = exp.bullets
+    .filter((b) => b.website_show !== false)
+    .sort((a, b) => a.cv_priority - b.cv_priority)
+    .map((b) => b.text);
 
   return { title, company: exp.company, period, description };
 });
 
-// Build skill categories (general variant)
+// Build skill categories from general variant only
 const websiteSkills = (skillsData as SkillCategory[])
   .filter((s) => s.variant === 'general')
   .map((s) => ({ category: s.category, skills: s.items }));
