@@ -138,7 +138,7 @@
 
   /* Extended tokens */
   --aw-color-text-default: oklch(78% 0.015 var(--hue-slate));
-  --aw-color-text-muted: oklch(60% 0.015 var(--hue-slate));
+  --aw-color-text-muted: oklch(68% 0.015 var(--hue-slate));
   --aw-color-text-heading: oklch(90% 0.02 var(--hue-slate));
   --aw-color-bg-page: oklch(22% 0.015 var(--hue-slate));
   --aw-color-bg-element: oklch(26% 0.015 var(--hue-slate));
@@ -154,7 +154,7 @@
   [data-theme='golden'] {
     /* Refined text hierarchy */
     --aw-color-text-default: #e8e8e8;
-    --aw-color-text-muted: rgb(232 232 232 / 60%);
+    --aw-color-text-muted: rgb(232 232 232 / 70%);
     --aw-color-text-heading: #fafafa;
 
     /* Deep backgrounds */
@@ -174,7 +174,7 @@
 
   [data-theme='teal'] {
     --aw-color-text-default: #e0e0e0;
-    --aw-color-text-muted: rgb(244 244 244 / 66%);
+    --aw-color-text-muted: rgb(244 244 244 / 70%);
     --aw-color-text-heading: #f4f4f4;
     --aw-color-bg-page: #121212;
     --aw-color-bg-element: #1a1a1a;
