@@ -1,0 +1,18 @@
+#!/bin/bash
+# Pre-commit hook - Run validation checks for all projects in monorepo
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+echo "🔍 Running pre-commit checks..."
+
+# CV Project (Typst)
+echo "--- CV Project (Typst) ---"
+cd "$ROOT" && mise run check
+
+# Website (Astro)
+echo "--- Website (Astro) ---"
+cd "$ROOT/website" && mise run check
+
+echo "✅ Pre-commit checks passed"

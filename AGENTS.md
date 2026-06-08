@@ -11,6 +11,15 @@
 - Always run `mise run check` before committing
 - Verify new Typst source files compile: `typst compile <file>.typ`
 - Check PDF output visually for layout shifts
+- Install git hooks via `mise run hooks` (run after clone/setup)
+
+### [GIT_HOOKS]
+
+- Pre-commit runs `mise run check` for both Typst CV and Astro website
+- Pre-push runs `mise run build` for both projects
+- Install: `mise run hooks`
+- Remove: `mise run uninstall-hooks`
+- Bypass: `git commit --no-verify` or `git push --no-verify`
 
 ### [COMMIT]
 

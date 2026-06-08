@@ -1,0 +1,18 @@
+#!/bin/bash
+# Pre-push hook - Verify builds for all projects in monorepo before pushing
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+echo "🚀 Running pre-push checks..."
+
+# CV Project (Typst) - verify all PDFs compile
+echo "--- CV Project (Typst) ---"
+cd "$ROOT" && mise run build-check
+
+# Website (Astro) - verify production build succeeds
+echo "--- Website (Astro) ---"
+cd "$ROOT/website" && mise run build
+
+echo "✅ Pre-push checks passed"

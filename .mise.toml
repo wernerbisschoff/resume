@@ -58,8 +58,26 @@ description = "Remove generated PDF artifacts"
 run = "rm -f W_Bisschoff_CV.pdf W_Bisschoff_CV_systems.pdf W_Bisschoff_CV_infrastructure.pdf W_Bisschoff_Cover_Letter.pdf"
 
 [tasks.setup]
-description = "Verify mise toolchain and typst version"
-run = "mise install && typst --version"
+description = "Verify mise toolchain, install hooks"
+run = "mise install && typst --version && mise run hooks"
+
+[tasks.hooks]
+description = "Install git hooks from .githooks/ into repo hooks directory"
+run = '''
+HOOKS_DIR="$(git rev-parse --git-path hooks)"
+cp .githooks/pre-commit "$HOOKS_DIR/pre-commit"
+cp .githooks/pre-push "$HOOKS_DIR/pre-push"
+chmod +x "$HOOKS_DIR/pre-commit" "$HOOKS_DIR/pre-push"
+echo "✅ Git hooks installed"
+'''
+
+[tasks.uninstall-hooks]
+description = "Remove git hooks"
+run = '''
+HOOKS_DIR="$(git rev-parse --git-path hooks)"
+rm -f "$HOOKS_DIR/pre-commit" "$HOOKS_DIR/pre-push"
+echo "✅ Git hooks removed"
+'''
 
 [tasks.test]
 description = "Run T002 YAML adapter integration tests"

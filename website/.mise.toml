@@ -4,11 +4,11 @@ opentofu = "1.11.5"
 
 [tasks]
 # === Dependency Management ===
-setup = "pnpm install"
+setup = "pnpm install && mise run hooks"
 
-# === Git Hooks ===
-hooks = { description = "Install git hooks", run = "if [ -d .githooks ]; then cp .githooks/pre-commit .git/hooks/pre-commit 2>/dev/null || true; cp .githooks/pre-push .git/hooks/pre-push 2>/dev/null || true; chmod +x .git/hooks/pre-commit 2>/dev/null || true; chmod +x .git/hooks/pre-push 2>/dev/null || true; echo '✅ Git hooks installed'; else echo '⚠️  No .githooks/ directory found'; exit 1; fi" }
-uninstall-hooks = { description = "Remove git hooks", run = "rm -f .git/hooks/pre-commit .git/hooks/pre-push && echo '✅ Git hooks removed'" }
+# === Git Hooks (delegated to root) ===
+hooks = { description = "Install git hooks (delegated to repo root)", run = "cd .. && mise run hooks" }
+uninstall-hooks = { description = "Remove git hooks (delegated to repo root)", run = "cd .. && mise run uninstall-hooks" }
 
 # === Validation ===
 check = "pnpm check"

@@ -1,5 +1,14 @@
 # CLAUDE.md — latex-cv / Typst Migration
 
+## Monorepo Structure
+
+This repository contains two independent projects:
+
+- **CV (Typst)** — root directory. This CLAUDE.md covers this project.
+- **Website (Astro)** — `website/` directory, with its own `website/CLAUDE.md`.
+
+**Workflow**: `cd website/` before working on the Astro site so your agent picks up the correct context from `website/CLAUDE.md`.
+
 ## Project Identity
 
 This repository produces 4 PDF documents from Typst source:
@@ -35,11 +44,14 @@ Primary Tool Execution API: `mise run <task>`
 | `mise run dev-infrastructure` | Watch infrastructure CV variant |
 | `mise run clean` | Remove generated PDF artifacts |
 | `mise run setup` | Verify mise toolchain and typst version |
+| `mise run hooks` | Install git hooks (pre-commit + pre-push) |
+| `mise run uninstall-hooks` | Remove git hooks |
 | `mise run help` | List all available tasks |
 
 ## Verification Loop
 
 - Run `mise run check` before any commit
+- Install git hooks via `mise run hooks` after cloning/setup
 - Compilation success is the primary test (no unit test framework)
 - Review generated PDFs visually for layout regressions
 - **Check page count**: after any content change, verify PDF page count via `pdfinfo <file>.pdf`. Both systems and infrastructure variants must fit on **1 page each**. The general CV may be 2 pages. If overflowing, trim experience bullets (Junior Lecturer can be dropped from variants, or shorten verbose bullets).

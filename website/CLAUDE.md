@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+This project lives in a **monorepo** at `website/`. The repo root (`../`) contains an independent CV (Typst) project with its own `CLAUDE.md`.
+
+**Workflow**: always work from this directory (`website/`) so your agent picks up this context. For CV work, `cd ..` to the repo root.
+
 <!-- MANAGED_BY: tools:init -->
 
 ## ⚙️ Project Execution Contract (MANDATORY)
@@ -139,17 +143,17 @@ TM-<ID>: <task title>
 
 ---
 
-### Git Hooks
+### Git Hooks (Monorepo)
 
-This repository uses git hooks to enforce code quality automatically:
+This repository is a monorepo — git hooks are managed at the **repo root** and cover both the CV (Typst) and website (Astro) projects.
 
-- **Pre-commit:** Runs `mise run check` (validates formatting, linting, type-checking)
-- **Pre-push:** Runs `mise run build` (verifies build succeeds)
+- **Pre-commit:** Runs `mise run check` for both projects
+- **Pre-push:** Runs `mise run build` for both projects
 
-Hooks are installed automatically by `mise run setup` and can be managed with:
+Install/remove from any directory:
 
-- `mise run hooks` - Install git hooks manually
-- `mise run uninstall-hooks` - Remove git hooks
+- `cd .. && mise run hooks` - Install git hooks (or `mise run hooks` from repo root)
+- `cd .. && mise run uninstall-hooks` - Remove git hooks (or `mise run uninstall-hooks` from repo root)
 
 **Skipping hooks:**
 
