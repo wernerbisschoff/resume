@@ -68,7 +68,7 @@ analytics:
   vendors:
     googleAnalytics:
       id: G-3Y4G3T4PXC # Add your GA4 Measurement ID (e.g., "G-XXXXXXXXXX")
-      partytown: true # Offload GA4 script to web worker for better performance
+      partytown: false # GA4 loaded directly (better Lighthouse score)
 
 ui:
   theme: 'dark:only' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

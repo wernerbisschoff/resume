@@ -8,13 +8,30 @@
 export const CONTACT_INFO = {
   // Personal details
   name: 'Werner Bisschoff',
-  jobTitle: 'Software Engineer',
+  jobTitle: 'Software Engineer — Available for Contract',
   location: 'Cape Town',
   country: 'South Africa',
 
   // Contact
   email: 'contact@bisschoff.dev',
   siteUrl: 'https://werner.bisschoff.dev',
+
+  // Professional focus
+  expertise: [
+    'Embedded Systems',
+    'System Architecture',
+    'Spec-Driven Development',
+    'AI Agentic Workflows',
+    'Performance Optimization',
+  ],
+  availability: {
+    '@type': 'Demand',
+    itemOffered: {
+      '@type': 'Service',
+      name: 'Software Engineering Contract',
+      description: 'Freelance software engineer available for contract work, consulting, and part-time engagements.',
+    },
+  },
 
   // Resume PDF
   resume: {
