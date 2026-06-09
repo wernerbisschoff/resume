@@ -1,5 +1,4 @@
 #import "modern-cv.typ": *
-#import "../content/data.typ": _star_text
 
 #let _resolve(value, variant) = {
   if type(value) == dictionary and variant in value {
@@ -12,13 +11,9 @@
 #let _normalize_bullets(descs) = {
   descs.map(b => {
     if type(b) == dictionary {
-      let story = b.at("star_story", default: none)
-      if story == none {
-        story = _star_text(b.at("star_ref", default: none))
-      }
-      (text: b.at("text", default: ""), star_story: story)
+      b.at("text", default: "")
     } else {
-      (text: str(b), star_story: none)
+      str(b)
     }
   })
 }
@@ -132,13 +127,7 @@
         #if entry.description.len() > 0 [
           #resume-item[
             #for desc in entry.description [
-              - #desc.text
-              #if desc.star_story != none [
-                #set text(size: 9pt, style: "italic")
-                #pad(left: 1.5em, top: 2pt, bottom: 2pt)[
-                  #desc.star_story
-                ]
-              ]
+              - #desc
             ]
           ]
         ]
@@ -160,23 +149,7 @@
       ]
     ]
 
-    #if projects.len() > 0 [
-      = Projects
-      #for entry in projects [
-        #resume-entry(
-          title: entry.name,
-          location: if entry.link != none { entry.link } else { "" },
-        )
-        #if entry.description.len() > 0 [
-          #resume-item[
-            #for desc in entry.description [
-              - #desc
-            ]
-          ]
-        ]
-      ]
-    ]
-  ]
+]
 }
 
 #let render_cover_letter(data, variant: "general") = {

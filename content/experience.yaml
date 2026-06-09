@@ -23,7 +23,7 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Engineered a distributed real-time data engine utilizing Elixir/OTP and conflict-free replicated data types (CRDT models). Deployed in-memory GenServer storage buffers with threshold-based flush mechanics, reducing direct database write transactions by approximately 85% under sustained edit workloads."
+    - text: "Engineered a distributed real-time data engine using Elixir/OTP and CRDTs. Deployed in-memory GenServer buffers with threshold-based flush, reducing database writes by ~85% under sustained load."
       variant: "shared"
       cv_priority: 1
       website_show: true
@@ -43,12 +43,12 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Implemented a single-database multi-tenant separation engine using PostgreSQL Row-Level Security (RLS) and transaction-scoped local parameters (SET LOCAL), enforcing strict data silos across isolated groups."
+    - text: "Implemented single-database multi-tenant isolation using PostgreSQL Row-Level Security (RLS) and transaction-scoped parameters, enforcing data silos across isolated groups."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Utilized Ecto.Multi atomic chains and Oban transactional background workers to ensure multi-stage backend edits (e.g., structural document renaming and incoming backlink indexing) execute completely or roll back safely."
+    - text: "Utilized Ecto.Multi atomic chains and Oban transactional workers to ensure multi-stage backend edits execute completely or roll back safely."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
@@ -118,11 +118,11 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Identified poor UX as root cause of recurring user errors — pushed back against 'training gap' framing, proposed user research to validate, and drove UX improvements that reduced task completion time and error rates."
+    - text: "Identified poor UX as root cause of recurring user errors — drove UX improvements that reduced task completion time and error rates."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
-      star_ref: "ux-improvements"
+      star_ref: null
     - text: "Refactored and extended ERPNext via Python and JavaScript server hooks, optimizing pricing matrices and BI reporting."
       variant: "infrastructure"
       cv_priority: 1
@@ -138,14 +138,14 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Provisioned and maintained a secure virtualized Linux infrastructure environment using Docker Compose for container isolation and writing custom backup and monitoring scripts."
+    - text: "Provisioned secure Linux infrastructure with Docker Compose for isolation and custom backup and monitoring scripts."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
       star_ref: null
     - text: "Diagnosed and resolved issues in a large existing ERPNext installation; introduced LLM-assisted debugging workflows."
       variant: "infrastructure"
-      cv_priority: 1
+      cv_priority: 3
       website_show: true
       star_ref: null
 
@@ -237,22 +237,22 @@
       variant: "systems"
       cv_priority: 1
       website_show: true
-      star_ref: "some-ip-performance-investigation"
+      star_ref: null
     - text: "Sole owner of an IPC service layer — studied existing node schema, designed node structures and data contracts, and implemented the communication layer enabling the frontend to consume the service."
       variant: "systems"
       cv_priority: 1
       website_show: true
-      star_ref: "ipc-service-implementation"
+      star_ref: null
     - text: "Built Python-based SOME/IP hardware mocks simulating request/response behavior; integrated into CI so automated tests ran without physical hardware."
       variant: "systems"
       cv_priority: 1
       website_show: true
-      star_ref: "some-ip-hardware-mocks"
-    - text: "Proactively created a Docker development container replicating the exact hardware environment — including VLAN and networking configuration — reducing setup time from hours to under an hour and enabling remote teams to develop without physical hardware."
+      star_ref: null
+    - text: "Created a Docker dev container replicating the hardware environment — including VLAN and networking — reducing setup from hours to under an hour for remote teams."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
-      star_ref: "docker-development-container"
+      star_ref: null
 - id: north-west-university
   company: "North-West University"
   location: "Potchefstroom"

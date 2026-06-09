@@ -3,34 +3,13 @@
 #let _education = yaml("education.yaml")
 #let _skills = yaml("skills.yaml")
 #let _projects = yaml("projects.yaml")
-#let _star_stories = yaml("star-stories.yaml")
 
 #let _variants = ("general", "systems", "infrastructure")
-
-#let _star_map = {
-  let m = (:)
-  for s in _star_stories {
-    m.insert(s.at("id", default: ""), s)
-  }
-  m
-}
 
 #let _init_variant_dict(f) = {
   let d = (:)
   for v in _variants { d.insert(v, f(v)) }
   d
-}
-
-#let _star_text(star_ref) = {
-  if star_ref == none { return none }
-  let story = _star_map.at(star_ref, default: none)
-  if story == none { return none }
-  let parts = ()
-  for k in ("situation", "task", "action", "result") {
-    let v = story.at(k, default: "")
-    if v != "" { parts = parts + (v,) }
-  }
-  if parts.len() == 0 { none } else { parts.join("\n\n") }
 }
 
 #let _variant_cap(v) = if v == "general" { 3 } else { 2 }
@@ -46,7 +25,6 @@
     })
     .map(b => (
       text: b.at("text", default: ""),
-      star_story: _star_text(b.at("star_ref", default: none)),
     ))
 }
 
