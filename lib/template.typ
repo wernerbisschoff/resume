@@ -204,7 +204,9 @@
     ]
 
     #if how_i_work != none [
-      #how_i_work
+      #for point in how_i_work [
+        #point
+      ]
     ]
   ]
 }

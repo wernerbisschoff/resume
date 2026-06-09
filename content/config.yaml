@@ -123,6 +123,11 @@ cover_letter:
         significantly lowering operational latency and eliminating third-party licensing dependencies.
 
   how_i_work:
+    general:
+      - >
+        I apply Spec-Driven Development (SDD) to ensure code correctness and maintain clear,
+        robust architectures across every project — from embedded firmware to cloud infrastructure.
+        I'm looking forward to bringing this discipline to your engineering team.
     systems:
       - >
         I approach software through the lens of Spec-Driven Development (SDD) to ensure code
