@@ -1,16 +1,34 @@
+# General Software Engineering
 "Software Engineer"
-"Python Developer"
-"Backend Developer"
-"Full Stack Developer"
 "Software Developer"
-"C++ Developer"
-"Embedded Software Engineer"
+"Full Stack Developer"
+"Full Stack Engineer"
+"Backend Developer"
 "Backend Software Engineer"
-"Junior Software Engineer" "Mid" "Senior"
-React Developer
-TypeScript Developer
-JavaScript Developer
-"Software Architect"
-"DevOps Engineer" Python
+"Python Developer"
+"C++ Developer"
+
+# Systems / Embedded
+"Embedded Software Engineer"
+"Embedded Systems Engineer"
+"Firmware Engineer"
+"Systems Engineer" Python
+"Edge Computing Engineer"
+"IoT Engineer"
+"Hardware Software Engineer"
+
+# Infrastructure / Platform
 "Platform Engineer"
+"DevOps Engineer" Python
 "Cloud Engineer" Python
+"Cloud Infrastructure Engineer"
+"Site Reliability Engineer" Python
+"Infrastructure Engineer" Python
+"Platform Developer"
+"Cloud Developer" Python
+
+# Architecture
+"Software Architect"
+"Systems Architect"
+"Infrastructure Architect"
+"Solutions Architect" Python
