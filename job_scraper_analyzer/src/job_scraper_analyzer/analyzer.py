@@ -1,8 +1,14 @@
-"""Droid exec AI analyzer for batch job fit rating.
+"""AI analyzer for batch job fit rating.
+
+Supports switchable backends:
+- opencode (default): uses `opencode run --model minimax/MiniMax-M3`
+- droid: uses `droid exec --auto low`
+
+Set the BACKEND constant to switch between them.
 
 This module handles:
 - Batching jobs for AI analysis
-- Building prompts for droid exec
+- Building prompts for the AI backend
 - Parsing AI responses for fit ratings
 - Storing analysis results to database
 """
@@ -17,10 +23,28 @@ from typing import List, Optional, Tuple
 from job_scraper_analyzer.models import Analysis, Job
 
 # Constants
-DROID_TIMEOUT_SECONDS = 120
+BACKEND = "opencode"  # Options: "opencode" or "droid"
+OPENCODE_MODEL = "minimax/MiniMax-M3"
+DROID_TIMEOUT_SECONDS = 300
+OPENCODE_TIMEOUT_SECONDS = 300
 DROID_NOT_FOUND_CODE = 127
+OPENCODE_NOT_FOUND_CODE = 127
 RATE_LIMIT_CODE = 429
 MAX_PARALLEL_BATCHES = 5
+ENGINEERING_TITLE_KEYWORDS = ["engineer", "developer", "programmer"]
+
+
+def _is_software_engineering_title(title: str) -> bool:
+    """Check if job title indicates software engineering or development.
+
+    Deterministic pre-filter to catch clearly non-engineering titles before
+    they reach the AI backend. Title must contain at least one keyword from
+    ENGINEERING_TITLE_KEYWORDS (case-insensitive).
+    """
+    if not title:
+        return False
+    title_lower = title.lower()
+    return any(kw in title_lower for kw in ENGINEERING_TITLE_KEYWORDS)
 
 
 def analyze_jobs(
@@ -30,7 +54,7 @@ def analyze_jobs(
     db_path: Optional[Path] = None,
     max_retries: int = 3,
 ) -> List[Analysis]:
-    """Analyze jobs in batches using droid exec for AI analysis.
+    """Analyze jobs in batches using opencode run for AI analysis.
 
     Args:
         jobs: List of Job objects to analyze
@@ -48,13 +72,26 @@ def analyze_jobs(
     results: List[Analysis] = []
     batch_id = str(uuid.uuid4())[:8]
 
-    # Process jobs in batches respecting batch_size, with parallel execution
-    batches = []
-    for i in range(0, len(jobs), batch_size):
-        batch = jobs[i:i + batch_size]
-        batches.append(batch)
+    # Pre-filter: auto-exclude clearly non-engineering titles (AI bypass)
+    engineering_mask = [_is_software_engineering_title(job.title) for job in jobs]
+    engineering_jobs = [job for job, is_eng in zip(jobs, engineering_mask) if is_eng]
 
-    # Process batches in parallel using ThreadPoolExecutor
+    if not engineering_jobs:
+        for job in jobs:
+            results.append(Analysis(
+                job_id=0,
+                batch_id=batch_id,
+                fit_rating=0,
+                justification=f"Non-software title: {job.title}",
+            ))
+        if db_path:
+            _store_results_to_db(results, db_path, jobs)
+        return results
+
+    # Process engineering jobs in batches
+    batches = []
+    for i in range(0, len(engineering_jobs), batch_size):
+        batches.append(engineering_jobs[i:i + batch_size])
     total_batches = len(batches)
 
     with ThreadPoolExecutor(max_workers=MAX_PARALLEL_BATCHES) as executor:
@@ -62,32 +99,51 @@ def analyze_jobs(
             executor.submit(_analyze_batch_combined, batch, cv_summary, batch_id, max_retries, i, total_batches): i
             for i, batch in enumerate(batches)
         }
-        # Collect results in order
         batch_results_map = {}
         for future in as_completed(futures):
             batch_idx = futures[future]
             try:
                 batch_results_map[batch_idx] = future.result()
             except RuntimeError:
-                # Re-raise RuntimeError (e.g., droid not installed) - this is fatal
                 raise
             except Exception as e:
-                # On failure, return default analysis for all jobs in batch
                 batch_results_map[batch_idx] = [
                     Analysis(
                         job_id=0,
                         batch_id=batch_id,
-                        fit_rating=2,
+                        fit_rating=1,
                         justification=f"Batch analysis failed: {str(e)[:100]}",
                     )
                     for _ in batches[batch_idx]
                 ]
 
-    # Reconstruct results in order
+    # Reconstruct engineering results in order
+    engineering_results: List[Analysis] = []
     for batch_idx in sorted(batch_results_map.keys()):
-        results.extend(batch_results_map[batch_idx])
+        engineering_results.extend(batch_results_map[batch_idx])
 
-    # Store to database if path provided
+    # Merge back into original order, slotting pre-excluded entries
+    eng_iter = iter(engineering_results)
+    for job, is_eng in zip(jobs, engineering_mask):
+        if is_eng:
+            result = next(eng_iter, None)
+            if result is not None:
+                results.append(result)
+            else:
+                results.append(Analysis(
+                    job_id=0,
+                    batch_id=batch_id,
+                    fit_rating=1,
+                    justification="Missing AI result — batch response incomplete",
+                ))
+        else:
+            results.append(Analysis(
+                job_id=0,
+                batch_id=batch_id,
+                fit_rating=0,
+                justification=f"Non-software title: {job.title}",
+            ))
+
     if db_path:
         _store_results_to_db(results, db_path, jobs)
 
@@ -111,7 +167,6 @@ def _call_droid_exec(prompt: str, max_retries: int) -> str:
     retries = 0
     while retries <= max_retries:
         try:
-            # Write prompt to temp file to avoid argument list limits
             import tempfile
             with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
                 f.write(prompt)
@@ -153,6 +208,76 @@ def _call_droid_exec(prompt: str, max_retries: int) -> str:
             raise RuntimeError(f"droid exec failed after {max_retries} retries: {e}")
 
 
+def _call_opencode_run(prompt: str, max_retries: int) -> str:
+    """Execute opencode run command and return response.
+
+    Args:
+        prompt: Prompt string to send to opencode
+        max_retries: Maximum retry attempts
+
+    Returns:
+        Response text from opencode
+
+    Raises:
+        RuntimeError: If opencode fails after retries
+        FileNotFoundError: If opencode command not found
+    """
+    retries = 0
+    while retries <= max_retries:
+        try:
+            result = subprocess.run(
+                ["opencode", "run", "--model", OPENCODE_MODEL, "--dangerously-skip-permissions"],
+                input=prompt,
+                capture_output=True,
+                text=True,
+                timeout=OPENCODE_TIMEOUT_SECONDS,
+            )
+
+            if result.returncode == OPENCODE_NOT_FOUND_CODE or "not found" in result.stderr.lower():
+                raise FileNotFoundError("opencode: command not found")
+
+            if result.returncode == RATE_LIMIT_CODE:
+                if retries < max_retries:
+                    retries += 1
+                    continue
+                raise RuntimeError("Rate limited by AI service (429)")
+
+            if result.returncode != 0:
+                raise RuntimeError(f"opencode run failed: {result.stderr}")
+
+            return result.stdout.strip()
+
+        except FileNotFoundError as e:
+            raise RuntimeError(f"opencode not installed: {e}")
+        except RuntimeError:
+            raise
+        except subprocess.TimeoutExpired:
+            if retries < max_retries:
+                retries += 1
+                continue
+            raise RuntimeError(f"opencode run timed out after {max_retries} retries")
+        except Exception as e:
+            if retries < max_retries:
+                retries += 1
+                continue
+            raise RuntimeError(f"opencode run failed after {max_retries} retries: {e}")
+
+
+def _call_ai_backend(prompt: str, max_retries: int) -> str:
+    """Dispatch to the configured AI backend.
+
+    Args:
+        prompt: Prompt string to send
+        max_retries: Maximum retry attempts
+
+    Returns:
+        Response text from the AI backend
+    """
+    if BACKEND == "droid":
+        return _call_droid_exec(prompt, max_retries)
+    return _call_opencode_run(prompt, max_retries)
+
+
 def _analyze_batch_combined(
     batch: List[Job],
     cv_summary: str,
@@ -180,7 +305,7 @@ def _analyze_batch_combined(
     prompts = [_build_analysis_prompt(job, cv_summary) for job in batch]
     combined_prompt = "\n---\n".join(prompts)
 
-    response_text = _call_droid_exec(combined_prompt, max_retries)
+    response_text = _call_ai_backend(combined_prompt, max_retries)
     return _parse_batch_response(response_text, batch, batch_id)
 
 
@@ -190,7 +315,7 @@ def _analyze_single_job(
     batch_id: str,
     max_retries: int,
 ) -> Analysis:
-    """Analyze a single job using droid exec.
+    """Analyze a single job using opencode run.
 
     Args:
         job: Job to analyze
@@ -204,19 +329,18 @@ def _analyze_single_job(
     prompt = _build_analysis_prompt(job, cv_summary)
 
     try:
-        response_text = _call_droid_exec(prompt, max_retries)
-        fit_rating, justification = _parse_droid_response(response_text)
+        response_text = _call_ai_backend(prompt, max_retries)
+        fit_rating, justification = _parse_opencode_response(response_text)
     except (ValueError, KeyError):
-        # Return default analysis if parsing fails
         return Analysis(
             job_id=0,
             batch_id=batch_id,
-            fit_rating=2,  # Default to Marginal
+            fit_rating=1,
             justification="Unable to parse AI response",
         )
 
     return Analysis(
-        job_id=0,  # Job.id not available on Pydantic model
+        job_id=0,
         batch_id=batch_id,
         fit_rating=fit_rating,
         justification=justification,
@@ -231,7 +355,7 @@ def _parse_batch_response(
     """Parse batch response into individual Analysis objects.
 
     Args:
-        response: Raw response from droid exec
+        response: Raw response from opencode
         batch: Original batch of jobs
         batch_id: Batch identifier
 
@@ -256,7 +380,7 @@ def _parse_batch_response(
             data = json.loads(line)
             if "fit_rating" in data:
                 # This is a JSON response for a job
-                fit_rating, justification = _parse_droid_response(line)
+                fit_rating, justification = _parse_opencode_response(line)
 
                 # Match to job by position if we have enough results
                 if len(results) < len(batch):
@@ -273,7 +397,7 @@ def _parse_batch_response(
                 opt in line.lower() for opt in ["perfect", "good", "marginal", "no fit"]
             ):
                 try:
-                    fit_rating, justification = _parse_droid_response(line)
+                    fit_rating, justification = _parse_opencode_response(line)
                     if len(results) < len(batch):
                         job = batch[len(results)]
                         results.append(Analysis(
@@ -288,7 +412,7 @@ def _parse_batch_response(
     # If no structured results found, try to parse the entire response
     if not results:
         try:
-            fit_rating, justification = _parse_droid_response(response)
+            fit_rating, justification = _parse_opencode_response(response)
             for job in batch:
                 results.append(Analysis(
                     job_id=0,  # Job.id not available on Pydantic model
@@ -302,7 +426,7 @@ def _parse_batch_response(
                 results.append(Analysis(
                     job_id=0,  # Job.id not available on Pydantic model
                     batch_id=batch_id,
-                    fit_rating=2,  # Default to Marginal
+                    fit_rating=1,  # Default to BACKLOG on parse failure
                     justification="Unable to parse AI response",
                 ))
 
@@ -317,15 +441,30 @@ def _build_analysis_prompt(job: Job, cv_summary: str) -> str:
         cv_summary: CV summary text
 
     Returns:
-        Formatted prompt string for droid exec
+        Formatted prompt string for opencode
     """
     prompt = f"""[DOMAIN]: JOB_SCREENING_CLASSIFICATION
-[PERSONA]: ELITE_TECHNICAL_RECRUITER
-[OBJECTIVE]: Algorithmic sourcing triage — maximize precision and recall for software engineering roles.
+[PERSONA]: ELITE_TECHNICAL_RECRUITER — STRICT CLASSIFIER
+[OBJECTIVE]: Classify this job posting. Only accept hands-on Software Engineering or Software Development roles.
+
+## [MANDATORY_RULES]
+1. STRICT CLASSIFIER ONLY. Do NOT give recommendations, advice, or suggestions. Only output the JSON classification.
+2. ONLY Software Engineering and Software Development roles are accepted. IT support, sysadmin, QA (manual), data entry, sales, marketing, admin, recruiting, customer success, finance, design, and technical writing are EXCLUDED.
+3. Use the EXACT title and description below. Do NOT infer or hallucinate details. If the title is non-engineering, EXCLUDE immediately regardless of description keywords.
+4. If uncertain, EXCLUDE (0). Do NOT default to a middle rating.
 
 ## [CV_SUMMARY]
 {cv_summary}
 [/CV_SUMMARY]
+
+**CRITICAL**: This candidate is a hands-on Software Engineer, NOT a salesperson, NOT an admin, NOT a recruiter. They write code (Python, C/C++, Elixir, TypeScript). If the role does not primarily involve writing/architecting/testing production code, it is NOT a fit.
+
+**NOTE**: The CV_SUMMARY may contain multiple persona variants:
+- **general**: Software Engineer (full-stack + embedded + automation)
+- **systems**: Hybrid Edge/Systems Engineer (C/C++, FreeRTOS, Elixir/OTP, real-time)
+- **infrastructure**: Cloud Infrastructure Engineer / Platform Developer (Python, Docker, AWS, PostgreSQL, Pulumi)
+
+Evaluate the job against ALL variants present and report which variant(s) it matches best.
 
 ## [LOCATION_CONSTRAINTS]
 - Ideal: Fully remote
@@ -342,28 +481,51 @@ Description: {job.description or 'No description available'}
 
 ---
 
-## [STEP_1]: BINARY HARD FILTERS
-Evaluate EITHER condition → immediately halt and fail role if triggered.
+## [STEP_1]: HARD EXCLUSION — TITLE CHECK (MANDATORY, BEFORE DESCRIPTION)
+**CRITICAL RULE**: Evaluate the TITLE FIRST. The title alone is sufficient to reject. Do NOT let the description override the title — descriptions of non-engineering roles often mention tech keywords (e.g., "SaaS", "Python", "AI", "platform") to attract applicants. Ignore those keywords if the title is non-engineering.
 
-1. **NON-SOFTWARE**: Primary daily responsibility is NOT writing/architecting/testing code (pure IT, hardware, manual QA, project management, sales engineering without dev).
+### Exclude (triage_rating = 0) if title contains ANY of:
+- **Sales/biz**: sales, sdr, account executive, account manager, business development, growth
+- **Admin/office**: executive assistant, personal assistant, admin assistant, office manager, receptionist
+- **Customer/account**: customer success, customer support, account support, client success
+- **Marketing/recruiting**: marketing, content, social media, seo, recruiter, talent acquisition, hr, people operations
+- **Finance/accounting**: accountant, finance, accounting, bookkeeper, auditor, payroll
+- **IT support**: IT support, helpdesk, IT technician, desktop support, service desk
+- **Management (non-technical)**: project manager, program manager, scrum master, agile coach, product owner
+- **Other non-engineering**: technical writer, graphic designer, data entry, business analyst, operations manager, office administrator
 
-If EITHER triggers → composite_fit_rating = 1, rejection_trigger_if_any = "<reason>".
+### Examples of misleading descriptions to IGNORE:
+- "Accountant @ crypto SaaS company" → title is "Accountant", **EXCLUDE**. The "SaaS" and "crypto" in the description do not make this a software role.
+- "Customer Success Manager at tech company" → title is "Customer Success Manager", **EXCLUDE**. Relationship management is not software engineering.
+- "Growth Marketing Manager (B2B)" → title is "Growth Marketing Manager", **EXCLUDE**. Marketing is not software engineering.
+
+If title triggers → triage_rating = 0, rejection_trigger_if_any = "Non-software title: <title>".
 
 ---
 
-## [STEP_2]: MULTI-DIMENSIONAL ANALYSIS
-If passing Step 1, evaluate:
+## [STEP_2]: DESCRIPTION-BASED NON-SOFTWARE CHECK (only if title passed Step 1)
+Primary daily responsibility is NOT writing/architecting/testing code. Examples: sales/SDR/business development, executive/personal assistant, administrative support, office manager, receptionist, customer service/support, marketing, HR/recruiting, finance/accounting, project manager (non-technical), product manager (non-technical), business analyst, data entry, IT support/helpdesk (no coding), manual QA (no coding), sales engineering without dev, technical writing, graphic design, pure IT/hardware. Low-level firmware (C/C++, FreeRTOS) IS software engineering.
 
-1. **Seniority & Depth**: Role complexity vs candidate capability (5+ years cross-disciplinary: Embedded C++ + Full-stack Python/TS + Agentic workflows). Not years, depth.
+If triggered → triage_rating = 0, rejection_trigger_if_any = "<reason>".
+
+---
+
+## [STEP_3]: MULTI-DIMENSIONAL ANALYSIS
+If passing Step 1 and Step 2, evaluate:
+
+1. **Seniority & Depth**: Role complexity vs candidate capability (5+ years cross-disciplinary: Embedded C++/FreeRTOS + Full-stack Python/React/Elixir + Cloud infrastructure/AWS + Agentic AI workflows). Not years, depth.
 2. **Technical Stack Overlap**:
-   - Core Matches: Python, React, SQL, C++, AWS (direct alignment)
-   - Strategic Adjacencies: Elixir↔Phoenix, Cap'n Proto↔gRPC (transferable)
+   - Consider ALL three profiles (general/systems/infrastructure) from CV
+   - Core Matches: Python, C/C++, SQL/PostgreSQL, Docker, AWS, Linux, Git, CI/CD
+   - Systems Matches: FreeRTOS, ESP32/ESP-IDF, BLE/NimBLE, NFC APDU, UART/SPI/I2C, Elixir/OTP, Cap'n Proto
+   - Infrastructure Matches: Docker Compose, Pulumi (IaC), PostgreSQL RLS/Tuning, ERPNext/Frappe, Elixir/Phoenix, Inngest/Oban
+   - Strategic Adjacencies: AWS Cert in progress, Phoenix LiveView, Ecto, Pulumi
    - Hard Gaps: Mandatory tech missing with high learning curve
 3. **Location & Work Style**: Remote preference weighted highest; 1-2 days hybrid acceptable; more days in Cape Town acceptable only in desperate mode and if role is otherwise strong.
 
 ---
 
-## [STEP_3]: OUTPUT FORMULATION
+## [STEP_4]: OUTPUT FORMULATION
 Generate `analytical_scratchpad` BEFORE `triage_rating`. Rating MUST derive from analysis.
 
 ```json
@@ -400,30 +562,32 @@ Generate `analytical_scratchpad` BEFORE `triage_rating`. Rating MUST derive from
 ---
 
 ## [TRIAGE_SCALE]
-Use this action-driven scale:
+Apply this strict 3-tier scale:
 
-| Rating | Class | Downstream Action |
-|--------|-------|-------------------|
-| 0 | EXCLUDE | Discard immediately. Fails binary filter (non-software) or banned tech. |
-| 1 | BACKLOG | Viable software role but high learning curves or low stack alignment. Queue for bulk automation applications. |
-| 2 | STANDARD | Strong core tech + seniority alignment. Standard application queue with base resume template. |
-| 3 | PRIORITY | High-velocity match across all domains. Requires manually tailored cover letter or custom resume. |
+| Rating | Class | Criteria |
+|--------|-------|----------|
+| 0 | EXCLUDE | Fails binary filter (non-software) or fundamental tech mismatch. |
+| 1 | BACKLOG | Passes binary filter but has significant gaps — hard gaps, low seniority/stack alignment, or workstyle conflicts. |
+| 3 | PRIORITY | Strong match — scoring_matrix average ≥ 4, no hard gaps, strong workstyle alignment. |
+
+**CRITICAL**: Rating 2 (STANDARD) is DISABLED. Do NOT use it. If not a clear PRIORITY (3), classify as BACKLOG (1) or EXCLUDE (0).
 
 **Scoring Rules:**
 - triage_rating 0 (EXCLUDE): Fails binary filter (is_software_engineering=false) or fundamental tech mismatch.
-- triage_rating 1 (BACKLOG): Passes binary filter but scoring_matrix average < 3 OR multiple hard gaps.
-- triage_rating 2 (STANDARD): scoring_matrix average ≥ 3 with no hard gaps; workstyle_score can be lower.
-- triage_rating 3 (PRIORITY): scoring_matrix average ≥ 4 across all dimensions with strong stack overlap.
+- triage_rating 1 (BACKLOG): Passes binary filter but scoring_matrix average < 4 OR any hard gaps exist.
+- triage_rating 3 (PRIORITY): scoring_matrix average ≥ 4 across all dimensions, no hard gaps, strong stack overlap.
 
 ---
 
-## [EXAMPLE]
+## [EXAMPLES]
+
+### Example 1: Backend/Infrastructure match
 Input:
 ```
-Title: Senior Python Backend Engineer
-Company: TechFin
-Location: Cape Town (Hybrid)
-Description: Build ML pipelines with Python/FastAPI. 5+ years exp with distributed systems. AWS required.
+Title: Senior Platform Engineer
+Company: CloudCo
+Location: Remote
+Description: Build and maintain Kubernetes infrastructure, CI/CD pipelines, and developer tooling. Python and AWS required. PostgreSQL experience a plus.
 ```
 
 Output:
@@ -434,28 +598,59 @@ Output:
     "rejection_trigger_if_any": "N/A"
   }},
   "analytical_scratchpad": {{
-    "seniority_match_critique": "Role demands 5+ years distributed systems — candidate's cross-disciplinary depth covers this with embedded C++ and backend Python experience.",
-    "stack_overlap_critique": "Core Match: Python, FastAPI, AWS. Strategic Adjacency: ML pipelines map to candidate's agentic workflows. No hard gaps identified.",
-    "workstyle_critique": "Hybrid in Cape Town is acceptable under desperate mode; remote preference slightly penalized."
+    "seniority_match_critique": "Role demands platform engineering skills — candidate's infrastructure variant covers Docker, AWS, CI/CD, and Linux systems administration. Seniority aligns well.",
+    "stack_overlap_critique": "Core Match: Python, AWS, Docker, CI/CD, PostgreSQL. Variant match: infrastructure profile. Adjacent: Pulumi IaC maps to infrastructure-as-code needs. Hard gaps: Kubernetes not explicitly listed but Docker/container experience transfers.",
+    "workstyle_critique": "Fully remote — ideal alignment."
   }},
   "scoring_matrix": {{
     "seniority_score": 4,
-    "stack_score": 5,
-    "workstyle_score": 3
+    "stack_score": 4,
+    "workstyle_score": 5
   }},
   "triage_rating": 3,
-  "actionable_justification": "High-velocity match with Python stack, AWS, and ML pipeline domain alignment. PRIORITY queue for tailored cover letter."
+  "actionable_justification": "Strong infrastructure profile match with Python, AWS, Docker, and PostgreSQL alignment. Fully remote. Best variant: infrastructure. PRIORITY queue for tailored cover letter."
+}}
+```
+
+### Example 2: Systems/Embedded match
+Input:
+```
+Title: Embedded Linux Engineer
+Company: Hardware Inc
+Location: Remote
+Description: Develop firmware for IoT devices using C/C++ on ARM Cortex-M. Experience with BLE wireless protocols and real-time constraints.
+```
+
+Output:
+```json
+{{
+  "binary_filters": {{
+    "is_software_engineering": true,
+    "rejection_trigger_if_any": "N/A"
+  }},
+  "analytical_scratchpad": {{
+    "seniority_match_critique": "Role demands embedded C/C++ and real-time firmware experience — candidate's systems variant covers FreeRTOS, ESP32, BLE/NimBLE, and bare-metal runtimes. Strong alignment.",
+    "stack_overlap_critique": "Core Match: C/C++, BLE/NimBLE, real-time constraints. Variant match: systems profile. Strategic Adjacency: FreeRTOS and ESP-IDF experience maps to ARM Cortex-M constraints. No hard gaps.",
+    "workstyle_critique": "Fully remote — ideal alignment."
+  }},
+  "scoring_matrix": {{
+    "seniority_score": 5,
+    "stack_score": 5,
+    "workstyle_score": 5
+  }},
+  "triage_rating": 3,
+  "actionable_justification": "Exceptional systems profile match with embedded C++, BLE, and real-time firmware experience. Best variant: systems. PRIORITY queue for tailored cover letter."
 }}
 ```
 """
     return prompt
 
 
-def _parse_droid_response(response: str) -> Tuple[int, str]:
-    """Parse fit rating and justification from droid exec response.
+def _parse_opencode_response(response: str) -> Tuple[int, str]:
+    """Parse fit rating and justification from opencode response.
 
     Args:
-        response: Raw response from droid exec
+        response: Raw response from opencode
 
     Returns:
         Tuple of (fit_rating, justification)
@@ -531,7 +726,7 @@ def _parse_droid_response(response: str) -> Tuple[int, str]:
                 return rating, justification[:200]  # Limit length
 
     # If no recognized format, raise error
-    raise ValueError(f"Unable to parse droid response: {response[:100]}")
+    raise ValueError(f"Unable to parse opencode response: {response[:100]}")
 
 
 def _store_results_to_db(
