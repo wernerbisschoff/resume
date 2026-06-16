@@ -11,6 +11,7 @@ import typer
 from rich.console import Console
 
 from job_scraper_analyzer import analyzer, database, scraper
+from job_scraper_analyzer.cv_parser import parse_yaml_resume
 
 # Default database path
 DEFAULT_DB_PATH = Path.home() / ".local" / "share" / "job-scraper-analyzer" / "jobs.db"
@@ -132,25 +133,34 @@ def fetch(
 def analyze(
     batch_size: int = typer.Option(10, "--batch-size", help="Jobs per analysis batch"),
     max_jobs: Optional[int] = typer.Option(None, "--max-jobs", help="Maximum jobs to analyze (default: all unanalyzed)"),
-    cv_path: Optional[str] = typer.Option(None, "--cv", help="Path to CV file (default: resume-data/data.yaml)"),
+    cv_path: Optional[str] = typer.Option(None, "--cv", help="Path to content/ directory or resume file (default: content/ in repo root)"),
+    variant: str = typer.Option("all", "--variant", help="Resume variant: general, systems, infrastructure, or all"),
     db_path: Optional[Path] = typer.Option(None, "--db", help="Database path"),
 ) -> None:
     """Analyze jobs with AI fit rating."""
     db_path = _ensure_db_path(db_path)
 
-    # Use provided CV path or default to resume-data/data.yaml
+    # Use provided CV path or default to content/ directory
     if cv_path is None:
-        cv_path = Path(__file__).parent.parent.parent.parent / "resume-data" / "data.yaml"
+        content_dir = Path(__file__).parent.parent.parent.parent / "content"
     else:
-        cv_path = Path(cv_path)
+        content_dir = Path(cv_path)
 
-    # Read CV content directly (supports both YAML and LaTeX)
-    if cv_path.exists():
-        cv_text = cv_path.read_text(encoding="utf-8")
-        typer.echo(f"Using CV: {cv_path}")
+    # Build CV text from YAML content files (supports variant filtering)
+    if content_dir.is_dir() and (content_dir / "config.yaml").exists():
+        try:
+            cv_text = parse_yaml_resume(content_dir, variant=variant)
+            typer.echo(f"Using YAML resume from: {content_dir} (variant: {variant})")
+        except Exception as e:
+            typer.echo(f"Warning: Could not parse YAML resume: {e}")
+            cv_text = "Senior Software Engineer with experience in Python, Full-stack development, and AI/ML."
+            typer.echo("Using default summary.")
+    elif content_dir.exists() and content_dir.is_file():
+        cv_text = content_dir.read_text(encoding="utf-8")
+        typer.echo(f"Using CV file: {content_dir}")
     else:
         cv_text = "Senior Software Engineer with experience in Python, Full-stack development, and AI/ML."
-        typer.echo(f"CV file not found at {cv_path}, using default summary.")
+        typer.echo(f"CV path not found at {content_dir}, using default summary.")
 
     # Load jobs needing analysis
     jobs = database.get_jobs_needing_analysis(db_path=db_path) if max_jobs is None else database.get_jobs_needing_analysis(db_path=db_path, limit=max_jobs)
