@@ -1,8 +1,4 @@
-"""Tests for droid exec AI analyzer for batch job fit rating.
-
-RED PHASE: These tests define the expected behavior.
-They will FAIL until the analyzer module is implemented.
-"""
+"""Tests for opencode AI analyzer for batch job fit rating."""
 
 from datetime import date
 from typing import List, Tuple
@@ -48,38 +44,60 @@ class TestAnalyzeJobs:
             ),
         ]
 
-    def test_analyze_jobs_batch_calls_droid_exec(self) -> None:
-        """Test that analyze_jobs() calls droid exec for each batch.
-        
-        RED: analyze_jobs() must call `droid exec --auto low` for AI analysis.
-        The implementation should batch jobs and invoke droid exec for each batch.
-        """
+    def test_analyze_jobs_batch_calls_opencode_run_by_default(self) -> None:
+        """Test that analyze_jobs() calls opencode run by default."""
         jobs = self.setup_test_jobs()
         cv_summary = "Senior software engineer with Python, JavaScript, C++ skills"
-        
-        # Mock subprocess.run to capture droid exec calls
+
         with patch("job_scraper_analyzer.analyzer.subprocess.run") as mock_run:
-            # Configure mock to return a successful response
             mock_run.return_value = MagicMock(
                 returncode=0,
                 stdout='{"triage_rating": 3, "justification": "Priority match for Python role"}',
                 stderr=""
             )
-            
+
             from job_scraper_analyzer.analyzer import analyze_jobs
-            
-            # Call analyze_jobs with small batch size to trigger multiple calls
+
             results = analyze_jobs(jobs, cv_summary, batch_size=2, db_path=None)
-            
-            # Verify droid exec was called (at least once per batch)
-            assert mock_run.call_count >= 1, "droid exec should be called at least once per batch"
-            
-            # Verify the command structure includes droid exec
+
+            assert mock_run.call_count >= 1
+
             for call in mock_run.call_args_list:
                 args, kwargs = call
                 command = args[0] if args else kwargs.get("args", [])
-                assert "droid" in command, "Command should include droid"
-                assert "exec" in command, "Command should include exec subcommand"
+                assert "opencode" in command, "Default backend should be opencode"
+                assert "run" in command
+                assert "--model" in command
+
+    def test_analyze_jobs_calls_droid_exec_when_backend_is_droid(self) -> None:
+        """Test that analyze_jobs() calls droid exec when BACKEND is set to 'droid'."""
+        jobs = self.setup_test_jobs()
+        cv_summary = "Senior software engineer with Python, JavaScript, C++ skills"
+
+        with patch("job_scraper_analyzer.analyzer.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(
+                returncode=0,
+                stdout='{"triage_rating": 3, "justification": "Priority match for Python role"}',
+                stderr=""
+            )
+
+            from job_scraper_analyzer.analyzer import analyze_jobs, BACKEND
+            original = BACKEND
+            try:
+                import job_scraper_analyzer.analyzer as analyzer_mod
+                analyzer_mod.BACKEND = "droid"
+
+                results = analyze_jobs(jobs, cv_summary, batch_size=2, db_path=None)
+
+                assert mock_run.call_count >= 1
+
+                for call in mock_run.call_args_list:
+                    args, kwargs = call
+                    command = args[0] if args else kwargs.get("args", [])
+                    assert "droid" in command, "Should call droid exec when BACKEND=droid"
+                    assert "exec" in command
+            finally:
+                analyzer_mod.BACKEND = original
 
     def test_analyze_jobs_returns_analysis_results(self) -> None:
         """Test that analyze_jobs() returns a list of Analysis objects.
@@ -224,84 +242,68 @@ class TestBuildAnalysisPrompt:
         
         prompt = _build_analysis_prompt(job, "CV summary")
         
-        assert "fit" in prompt.lower(), "Prompt should mention fit rating"
+        assert "triage" in prompt.lower(), "Prompt should mention triage rating"
         # The rating options should be present
         assert any(opt in prompt for opt in ["EXCLUDE", "BACKLOG", "STANDARD", "PRIORITY", "0", "1", "2", "3"]), \
             "Prompt should include triage rating options"
 
 
-class TestParseDroidResponse:
-    """Test suite for _parse_droid_response() parsing logic."""
+class TestParseOpencodeResponse:
+    """Test suite for _parse_opencode_response() parsing logic."""
 
     def test_parse_fit_rating_from_response_json(self) -> None:
-        """Test parsing JSON response from droid exec.
-        
-        RED: _parse_droid_response() should extract triage_rating (0-3) and justification.
-        """
+        """Test parsing JSON response from opencode run."""
         response = '{"triage_rating": 3, "justification": "Priority match for skills"}'
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        fit_rating, justification = _parse_droid_response(response)
-        
+
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        fit_rating, justification = _parse_opencode_response(response)
+
         assert isinstance(fit_rating, int), "triage_rating should be an integer"
         assert fit_rating in [0, 1, 2, 3], "triage_rating should be between 0 and 3"
         assert justification == "Priority match for skills", "justification should be extracted"
 
     def test_parse_fit_rating_good(self) -> None:
-        """Test parsing a STANDARD triage rating response.
-        
-        RED: triage_rating should be 2 for STANDARD.
-        """
+        """Test parsing a STANDARD triage rating response."""
         response = '{"triage_rating": 2, "justification": "Standard match for the role"}'
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        fit_rating, justification = _parse_droid_response(response)
-        
+
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        fit_rating, justification = _parse_opencode_response(response)
+
         assert fit_rating == 2, "triage_rating 2 corresponds to STANDARD"
         assert "Standard match" in justification
 
     def test_parse_fit_rating_marginal(self) -> None:
-        """Test parsing a BACKLOG triage rating response.
-        
-        RED: triage_rating should be 1 for BACKLOG.
-        """
+        """Test parsing a BACKLOG triage rating response."""
         response = '{"triage_rating": 1, "justification": "Backlog - partial overlap with skills"}'
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        fit_rating, justification = _parse_droid_response(response)
-        
+
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        fit_rating, justification = _parse_opencode_response(response)
+
         assert fit_rating == 1, "triage_rating 1 corresponds to BACKLOG"
         assert "partial overlap" in justification
 
     def test_parse_fit_rating_no_fit(self) -> None:
-        """Test parsing an EXCLUDE triage rating response.
-        
-        RED: triage_rating should be 0 for EXCLUDE.
-        """
+        """Test parsing an EXCLUDE triage rating response."""
         response = '{"triage_rating": 0, "justification": "Exclude - significant mismatch"}'
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        fit_rating, justification = _parse_droid_response(response)
-        
+
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        fit_rating, justification = _parse_opencode_response(response)
+
         assert fit_rating == 0, "triage_rating 0 corresponds to EXCLUDE"
         assert "mismatch" in justification.lower()
 
-    def test_parse_droid_response_handles_text_ratings(self) -> None:
-        """Test parsing responses where triage_rating is specified as text.
-        
-        RED: Should handle responses like "PRIORITY" -> 3, "STANDARD" -> 2, etc.
-        """
-        # Response with text rating instead of number
+    def test_parse_opencode_response_handles_text_ratings(self) -> None:
+        """Test parsing responses where triage_rating is specified as text."""
         response = '{"triage_rating": "PRIORITY", "justification": "Ideal match"}'
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        fit_rating, justification = _parse_droid_response(response)
-        
+
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        fit_rating, justification = _parse_opencode_response(response)
+
         assert fit_rating == 3, "Text 'PRIORITY' should map to triage_rating 3"
         assert "Ideal match" in justification
 
@@ -320,23 +322,17 @@ class TestAnalyzerEdgeCases:
         
         assert results == [], "Empty job list should return empty results"
 
-    def test_parse_droid_response_handles_malformed_json(self) -> None:
-        """Test that _parse_droid_response() handles malformed JSON gracefully.
-        
-        RED: Malformed JSON should raise a clear error or return sensible defaults.
-        """
+    def test_parse_opencode_response_handles_malformed_json(self) -> None:
+        """Test that _parse_opencode_response() handles malformed JSON gracefully."""
         malformed_response = "This is not valid JSON"
-        
-        from job_scraper_analyzer.analyzer import _parse_droid_response
-        
-        with pytest.raises((ValueError, KeyError)):
-            _parse_droid_response(malformed_response)
 
-    def test_analyze_jobs_handles_droid_not_installed(self) -> None:
-        """Test handling when droid command is not found.
-        
-        RED: Should raise a clear error when droid is not available.
-        """
+        from job_scraper_analyzer.analyzer import _parse_opencode_response
+
+        with pytest.raises((ValueError, KeyError)):
+            _parse_opencode_response(malformed_response)
+
+    def test_analyze_jobs_handles_backend_not_installed(self) -> None:
+        """Test handling when the configured backend command is not found."""
         jobs = [
             Job(
                 job_url="https://linkedin.com/jobs/view/error",
@@ -346,22 +342,19 @@ class TestAnalyzerEdgeCases:
                 description="Job",
             )
         ]
-        
+
         with patch("job_scraper_analyzer.analyzer.subprocess.run") as mock_run:
-            mock_run.side_effect = FileNotFoundError("droid: command not found")
-            
+            mock_run.side_effect = FileNotFoundError("opencode: command not found")
+
             from job_scraper_analyzer.analyzer import analyze_jobs
-            
+
             with pytest.raises(RuntimeError) as exc_info:
                 analyze_jobs(jobs, "CV", batch_size=5, db_path=None)
-            
-            assert "droid" in str(exc_info.value).lower(), "Error should mention droid"
+
+            assert "not installed" in str(exc_info.value).lower()
 
     def test_analyze_jobs_handles_rate_limiting(self) -> None:
-        """Test that analyze_jobs() handles rate limiting from AI service.
-        
-        RED: When droid exec returns rate limit error, should retry or raise appropriate error.
-        """
+        """Test that analyze_jobs() handles rate limiting from AI service."""
         jobs = [
             Job(
                 job_url="https://linkedin.com/jobs/view/ratelimit",

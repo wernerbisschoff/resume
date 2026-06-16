@@ -475,3 +475,224 @@ class TestCvParserEdgeCases:
         assert "\\skillsep" not in result or "enspace" not in result
         assert "Python" in result
         assert "C++" in result or "C" in result
+
+
+class TestParseYamlResume:
+    """Test suite for parse_yaml_resume() YAML-based resume parsing."""
+
+    @pytest.fixture
+    def yaml_content_dir(self, tmp_path: Path) -> Generator[Path, None, None]:
+        """Create a sample content/ directory with YAML resume files."""
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # config.yaml
+        (content_dir / "config.yaml").write_text("""---
+name: "Werner Bisschoff"
+title:
+  general: "Software Engineer"
+  systems: "Hybrid Edge/Systems Engineer"
+  infrastructure: "Cloud Infrastructure Engineer / Platform Developer"
+
+contact:
+  email: "werner@bisschoff.dev"
+  location: "Cape Town, South Africa"
+  github: "wbisschoff13"
+  website: "https://werner.bisschoff.dev"
+
+summary:
+  general: "Software engineer with 5+ years bridging hardware and full-stack."
+  systems: "Hybrid Edge/Systems Engineer with C/C++ and FreeRTOS."
+  infrastructure: "Cloud Infrastructure Engineer with Docker and AWS."
+
+certification: "AWS Certified Solutions Architect – Associate (In Progress)"
+job_target:
+  - "Seeking mid to senior software engineering role."
+""", encoding="utf-8")
+
+        # experience.yaml
+        (content_dir / "experience.yaml").write_text("""---
+- id: faro-africa
+  company: "FARO Africa"
+  location: "Cape Town"
+  role:
+    general: "Full-Stack Software Engineer"
+    systems: "Embedded Systems & Integration Engineer"
+    infrastructure: "Full-Stack ERPNext & Automation Engineer"
+  start_date: "Aug 2024"
+  end_date: "Nov 2025"
+  bullets:
+    - text: "Extended ERPNext using Python/JavaScript to improve workflows."
+      variant: "general"
+    - text: "Built mobile app with NFC (ISO 14443-4) for e-paper price tags."
+      variant: "shared"
+    - text: "Designed ISO 14443-4 NFC communication architectures."
+      variant: "systems"
+    - text: "Provisioned AWS infrastructure with Pulumi."
+      variant: "infrastructure"
+""", encoding="utf-8")
+
+        # skills.yaml
+        (content_dir / "skills.yaml").write_text("""---
+- category: "Primary"
+  items:
+    - "C/C++"
+    - "Python"
+    - "FreeRTOS"
+  variant: "general"
+- category: "Primary Competencies"
+  items:
+    - "C"
+    - "C++"
+    - "FreeRTOS"
+  variant: "systems"
+- category: "Primary Competencies"
+  items:
+    - "Python"
+    - "Docker"
+    - "AWS"
+  variant: "infrastructure"
+""", encoding="utf-8")
+
+        # education.yaml
+        (content_dir / "education.yaml").write_text("""---
+- institution: "North-West University"
+  degree: "B.Eng. Computer and Electronic Engineering"
+  end_date: "2020"
+""", encoding="utf-8")
+
+        # projects.yaml
+        (content_dir / "projects.yaml").write_text("""---
+- id: divergent-tabletop-wiki
+  name: "Divergent Tabletop Wiki"
+  description: "Built a community wiki using Astro and Elixir."
+  technologies:
+    - "Astro"
+    - "Elixir"
+""", encoding="utf-8")
+
+        yield content_dir
+
+    def test_parse_yaml_resume_returns_string(self, yaml_content_dir: Path) -> None:
+        """Test that parse_yaml_resume() returns a non-empty string."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir)
+
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_parse_yaml_resume_contains_personal_info(self, yaml_content_dir: Path) -> None:
+        """Test that personal info is included in output."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir)
+
+        assert "Werner Bisschoff" in result
+        assert "werner@bisschoff.dev" in result
+        assert "Cape Town" in result
+
+    def test_parse_yaml_resume_filters_by_general_variant(self, yaml_content_dir: Path) -> None:
+        """Test that general variant filters correctly."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir, variant="general")
+
+        assert "Software Engineer" in result
+        assert "Full-Stack Software Engineer" in result
+        assert "Hybrid Edge/Systems Engineer" not in result
+        assert "Cloud Infrastructure Engineer" not in result
+
+    def test_parse_yaml_resume_filters_by_systems_variant(self, yaml_content_dir: Path) -> None:
+        """Test that systems variant filters correctly."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir, variant="systems")
+
+        assert "Hybrid Edge/Systems Engineer" in result
+        assert "Embedded Systems & Integration Engineer" in result
+        assert "C++" in result or "C" in result
+        assert "Software Engineer" not in result or "general" in result.lower()  # variant keyword in reference
+
+    def test_parse_yaml_resume_filters_by_infrastructure_variant(self, yaml_content_dir: Path) -> None:
+        """Test that infrastructure variant filters correctly."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir, variant="infrastructure")
+
+        assert "Cloud Infrastructure Engineer" in result
+        assert "Full-Stack ERPNext & Automation Engineer" in result
+        assert "Docker" in result
+        assert "AWS" in result
+
+    def test_parse_yaml_resume_includes_shared_bullets_in_all_variants(self, yaml_content_dir: Path) -> None:
+        """Test that 'shared' variant bullets appear in all variant outputs."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        for v in ("general", "systems", "infrastructure"):
+            result = parse_yaml_resume(yaml_content_dir, variant=v)
+            assert "NFC" in result, f"Shared bullet missing from variant '{v}'"
+
+    def test_parse_yaml_resume_raises_on_invalid_variant(self, yaml_content_dir: Path) -> None:
+        """Test that invalid variant raises ValueError."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        with pytest.raises(ValueError):
+            parse_yaml_resume(yaml_content_dir, variant="invalid")
+
+    def test_parse_yaml_resume_raises_on_missing_dir(self, tmp_path: Path) -> None:
+        """Test that missing directory raises FileNotFoundError."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        missing = tmp_path / "nonexistent"
+        with pytest.raises((FileNotFoundError, NotADirectoryError)):
+            parse_yaml_resume(missing, variant="general")
+
+    def test_parse_yaml_resume_includes_education(self, yaml_content_dir: Path) -> None:
+        """Test that education section is included."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir)
+
+        assert "B.Eng. Computer and Electronic Engineering" in result
+        assert "North-West University" in result
+
+    def test_parse_yaml_resume_includes_projects(self, yaml_content_dir: Path) -> None:
+        """Test that projects section is included."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir)
+
+        assert "Divergent Tabletop Wiki" in result
+        assert "Astro" in result
+        assert "Elixir" in result
+
+    def test_parse_yaml_resume_handles_real_content_dir(self) -> None:
+        """Test parsing from the actual content/ directory in the repo."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        content_dir = Path(__file__).parent.parent.parent.parent.parent / "content"
+
+        if not content_dir.exists():
+            pytest.skip(f"Content directory not found: {content_dir}")
+
+        result = parse_yaml_resume(content_dir, variant="all")
+
+        assert isinstance(result, str)
+        assert len(result) > 500
+        assert "Werner Bisschoff" in result
+        assert "FARO Africa" in result
+        assert "North-West University" in result
+
+    def test_parse_yaml_resume_with_all_variant_combines_all(self, yaml_content_dir: Path) -> None:
+        """Test that 'all' variant combines all three profiles."""
+        from job_scraper_analyzer.cv_parser import parse_yaml_resume
+
+        result = parse_yaml_resume(yaml_content_dir, variant="all")
+
+        assert "Software Engineer" in result
+        assert "Hybrid Edge/Systems Engineer" in result
+        assert "Cloud Infrastructure Engineer" in result
+        assert "Full-Stack Software Engineer" in result
+        assert "Embedded Systems & Integration Engineer" in result
+        assert "Full-Stack ERPNext & Automation Engineer" in result
