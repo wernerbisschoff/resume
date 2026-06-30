@@ -285,10 +285,11 @@ src/components/ui/Headline.astro       # Generic headline
 ```
 
 **Confusion matrix:**
-| File | Used Where |
-|------|-----------|
+
+| File                  | Used Where                         |
+| --------------------- | ---------------------------------- |
 | `blog/Headline.astro` | `MarkdownLayout.astro`, blog pages |
-| `ui/Headline.astro` | Not used by any page component |
+| `ui/Headline.astro`   | Not used by any page component     |
 
 **Note:** `ui/Headline.astro` is never imported anywhere despite existing in the codebase.
 
