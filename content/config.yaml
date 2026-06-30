@@ -1,7 +1,7 @@
 ---
 name: "Werner Bisschoff"
 title:
-  general: "Software Engineer"
+  general: "Hybrid Systems & Platform Engineer"
   systems: "Hybrid Edge/Systems Engineer"
   infrastructure: "Cloud Infrastructure Engineer / Platform Developer"
 
@@ -15,10 +15,9 @@ contact:
 
 summary:
   general: >
-    Software engineer with 5+ years of experience bridging hardware and full-stack development.
-    I combine technical depth in C++ and Python with a rigorous, agentic engineering methodology.
-    My focus is on resilient system design and productivity-enhancing AI workflows, governed by
-    security, processes, and specification-driven development.
+    Hybrid Systems & Platform Engineer spanning embedded firmware, distributed services, and
+    cloud-platform infrastructure. I bring C/C++, Python, and Elixir/OTP depth to resilient
+    system design, governed by Spec-Driven Development and audit-ready agentic AI workflows.
   systems: >
     Hybrid Edge/Systems Engineer with 5+ years of experience architecting end-to-end telemetry
     systems spanning edge compute to backend integration. Specializes in C/C++ and FreeRTOS for
@@ -59,12 +58,12 @@ certification: "AWS Certified Solutions Architect – Associate (In Progress —
 cover_letter:
   about_me:
     general: >
-      I am a software engineer with over 5 years of experience bridging hardware, full-stack
-      development, and resilient system architecture. My approach combines deep technical expertise
-      with a rigorous, AI-augmented methodology — utilizing agentic workflows to ship reliable
-      software at high velocity. With a background in Computer and Electronic Engineering (B.Eng.),
-      I don't just write code; I design systems that last, from low-level firmware to cloud-native
-      infrastructures.
+      I am a hybrid systems & platform engineer with over 5 years of experience bridging
+      embedded firmware, distributed services, and cloud-platform infrastructure. My approach
+      combines deep technical expertise with a rigorous, AI-augmented methodology — utilizing
+      agentic workflows to ship reliable software at high velocity. With a background in Computer
+      and Electronic Engineering (B.Eng.), I don't just write code; I design systems that last,
+      from low-level firmware to cloud-native infrastructures.
     systems: >
       I am writing to express my interest in the Senior Systems Engineering position at [Company].
       I specialize in engineering deterministic, real-time software architectures (C/C++, FreeRTOS,

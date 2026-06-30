@@ -3,7 +3,7 @@
   company: "Divergent Tabletop"
   location: "Cape Town"
   role:
-    general: "Founder and Host"
+    general: "Founder & Technical Lead"
     systems: "Principal Systems Architect"
     infrastructure: "Principal Systems Architect"
   start_date: "Jul 2025"
@@ -83,18 +83,8 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Migrated internal mobile Retool workflows to Expo → improved performance and enhanced long-term maintainability."
-      variant: "general"
-      cv_priority: 1
-      website_show: true
-      star_ref: null
     - text: "Provisioned AWS infrastructure with Pulumi; deployed Inngest and PayloadCMS services."
-      variant: "general"
-      cv_priority: 1
-      website_show: true
-      star_ref: null
-    - text: "Diagnosed and resolved issues in a large existing ERPNext installation."
-      variant: "general"
+      variant: "infrastructure"
       cv_priority: 1
       website_show: true
       star_ref: null
@@ -129,11 +119,6 @@
       website_show: true
       star_ref: null
     - text: "Architected migration of internal Retool workflows to Expo/React Native, reducing vendor licensing overhead."
-      variant: "infrastructure"
-      cv_priority: 1
-      website_show: true
-      star_ref: null
-    - text: "Built custom NFC scanner utilities within Expo for instantaneous physical inventory syncs."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
@@ -180,7 +165,7 @@
       star_ref: null
     - text: "Developed active object within QP Real-Time Embedded Framework (QSPY) to simulate device behaviour."
       variant: "general"
-      cv_priority: 1
+      cv_priority: 2
       website_show: true
       star_ref: null
     - text: "Architected deterministic FSMs on dual-core ESP32 using FreeRTOS for concurrent sensor arrays."
@@ -250,23 +235,6 @@
       star_ref: null
     - text: "Created a Docker dev container replicating the hardware environment — including VLAN and networking — reducing setup from hours to under an hour for remote teams."
       variant: "infrastructure"
-      cv_priority: 1
-      website_show: true
-      star_ref: null
-- id: north-west-university
-  company: "North-West University"
-  location: "Potchefstroom"
-  role:
-    general: "Junior Lecturer"
-    systems: "Junior Lecturer"
-    infrastructure: "Junior Lecturer"
-  start_date: "Feb 2020"
-  end_date: "Dec 2020"
-  variant_tags:
-    - "general"
-  bullets:
-    - text: "Lectured Python and C++ programming for Introduction to Programming for first year IT students in both remote and in-person settings."
-      variant: "general"
       cv_priority: 1
       website_show: true
       star_ref: null
