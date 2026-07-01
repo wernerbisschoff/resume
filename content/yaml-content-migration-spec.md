@@ -53,7 +53,7 @@ name: "Werner Bisschoff"
 email: "werner@bisschoff.dev"
 phone: "071 826 2066"
 location: "Cape Town, Western Cape, South Africa"
-github: "wbisschoff13"
+github: "wernerbisschoff"
 website: "https://werner.bisschoff.dev"
 linkedin: "wbisschoff"
 
