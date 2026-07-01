@@ -60,8 +60,8 @@ export const CONTACT_INFO = {
       icon: 'tabler:brand-linkedin',
     },
     twitter: {
-      url: 'https://twitter.com/wbisschoff13',
-      username: 'wbisschoff13',
+      url: 'https://twitter.com/wbisschoffdev',
+      username: 'wbisschoffdev',
     },
   },
 } as const;
