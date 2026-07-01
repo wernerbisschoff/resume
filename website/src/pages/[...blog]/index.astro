@@ -3,15 +3,16 @@ import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
 
 import merge from 'lodash.merge';
 import type { ImageMetadata } from 'astro';
+import type { MetaData } from '~/types';
 import Layout from '~/layouts/PageLayout.astro';
 import SinglePost from '~/components/blog/SinglePost.astro';
 import ToBlogLink from '~/components/blog/ToBlogLink.astro';
+import RelatedPosts from '~/components/blog/RelatedPosts.astro';
 
 import { getCanonical, getPermalink } from '~/utils/permalinks';
 import { getStaticPathsBlogPost, blogPostRobots } from '~/utils/blog';
 import { findImage } from '~/utils/images';
-import type { MetaData } from '~/types';
-import RelatedPosts from '~/components/blog/RelatedPosts.astro';
+import { CONTACT_INFO } from '~/config/contact';
 
 export const prerender = true;
 
@@ -28,8 +29,11 @@ const image = (await findImage(post.image)) as ImageMetadata | string | undefine
 
 const metadata = merge(
   {
-    title: post.title,
-    description: post.excerpt,
+    title: `${CONTACT_INFO.name} — ${post.title}`,
+    description:
+      post.excerpt ||
+      `Engineering notes by Werner Bisschoff on systems engineering, infrastructure engineering, embedded systems, test-driven development, and agentic AI workflows.`,
+    ignoreTitleTemplate: true,
     robots: {
       index: blogPostRobots?.index,
       follow: blogPostRobots?.follow,

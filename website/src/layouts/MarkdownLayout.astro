@@ -3,17 +3,22 @@ import Layout from '~/layouts/PageLayout.astro';
 import ScrollReveal from '~/components/anim/ScrollReveal.astro';
 
 import type { MetaData } from '~/types';
+import { CONTACT_INFO } from '~/config/contact';
 
 export interface Props {
   frontmatter: {
     title?: string;
+    publishDate?: Date;
+    updateDate?: Date;
+    excerpt?: string;
   };
 }
 
 const { frontmatter } = Astro.props;
 
 const metadata: MetaData = {
-  title: frontmatter?.title,
+  title: frontmatter?.title ? `${CONTACT_INFO.name} — ${frontmatter.title}` : CONTACT_INFO.name,
+  ignoreTitleTemplate: true,
 };
 ---
 
@@ -22,6 +27,7 @@ const metadata: MetaData = {
     <ScrollReveal direction="up" delay={0} duration={0.6}>
       <h1 class="font-bold font-heading text-4xl md:text-5xl leading-tighter tracking-tighter">{frontmatter.title}</h1>
     </ScrollReveal>
+
     <div
       class="mx-auto prose prose-lg max-w-4xl dark:prose-invert dark:prose-headings:text-slate-300 prose-md prose-headings:font-heading prose-headings:leading-tighter prose-headings:tracking-tighter prose-headings:font-bold prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-md prose-img:shadow-lg mt-8"
     >

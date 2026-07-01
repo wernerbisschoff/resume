@@ -16,14 +16,27 @@ export const CONTACT_INFO = {
   email: 'contact@bisschoff.dev',
   siteUrl: 'https://werner.bisschoff.dev',
 
-  // Professional focus
+  // Professional focus — used in knowsAbout, hero, llms.txt, footer, OG descriptions
   expertise: [
     'Embedded Systems',
+    'Systems Engineering',
     'System Architecture',
-    'Spec-Driven Development',
-    'AI-Assisted Workflows',
     'Infrastructure Engineering',
+    'Test-Driven Development',
+    'TDD',
+    'Agentic Engineering',
+    'AI Engineering',
+    'AI-Assisted Workflows',
+    'Spec-Driven Development',
     'Performance Optimization',
+  ],
+  // Short-form keywords for places that need compact lists (hero, footers)
+  expertiseShort: [
+    'Embedded Systems',
+    'Systems Engineering',
+    'Infrastructure Engineering',
+    'Agentic Engineering',
+    'TDD',
   ],
   availability: {
     '@type': 'Demand',

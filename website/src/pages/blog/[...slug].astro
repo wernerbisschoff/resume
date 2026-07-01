@@ -2,7 +2,10 @@
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('post');
+  // Filter drafts so the redirect pages don't expose _template or other
+  // unpublished posts in the sitemap. Without this, getCollection('post')
+  // returns every entry including draft: true.
+  const posts = await getCollection('post', (entry) => import.meta.env.DEV || entry.data.draft !== true);
   return posts.map((post) => ({
     params: { slug: post.id.replace(/\.mdx?$/, '') },
   }));

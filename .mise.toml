@@ -1,3 +1,6 @@
+[env]                                                                                                                                          
+_.path = ["/Users/werner/.local/share/mise/installs/node/lts/bin"]
+
 [tools]
 typst = "0.14.2"
 node = "22.13.0"

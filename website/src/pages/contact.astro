@@ -5,11 +5,11 @@ import { CONTACT_INFO } from '~/config/contact';
 import { getContactPageSchema } from '~/utils/structured-data';
 
 const metadata = {
-  title: 'Contact — Werner Bisschoff',
+  title: 'Werner Bisschoff — Contact',
   description:
-    'Get in touch to discuss your software engineering needs. Open to freelance, contract, part-time, full-time, and remote work opportunities in Cape Town.',
+    'Contact Werner Bisschoff for embedded systems, systems engineering, infrastructure engineering, test-driven development, and agentic AI workflows. Open to freelance, contract, part-time, full-time, and remote work in Cape Town or internationally.',
+  ignoreTitleTemplate: true,
 };
-
 const contactSchema = getContactPageSchema();
 ---
 
@@ -192,7 +192,7 @@ const contactSchema = getContactPageSchema();
                 <a
                   href={CONTACT_INFO.social.github.url}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="me noopener noreferrer"
                   aria-label="GitHub Profile"
                   class="inline-flex items-center px-4 py-2 bg-bg-element border border-border/20 rounded-sm text-text-muted hover:text-primary hover:border-primary transition-all duration-300"
                 >
@@ -208,7 +208,7 @@ const contactSchema = getContactPageSchema();
                 <a
                   href={CONTACT_INFO.social.linkedin.url}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="me noopener noreferrer"
                   aria-label="LinkedIn Profile"
                   class="inline-flex items-center px-4 py-2 bg-bg-element border border-border/20 rounded-sm text-text-muted hover:text-primary hover:border-primary transition-all duration-300"
                 >

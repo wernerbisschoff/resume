@@ -8,6 +8,7 @@ import ScrollReveal from '~/components/anim/ScrollReveal.astro';
 
 import { getPermalink } from '~/utils/permalinks';
 import { getFormattedDate } from '~/utils/utils';
+import { CONTACT_INFO } from '~/config/contact';
 
 import type { Post } from '~/types';
 
@@ -47,6 +48,24 @@ const { post, url } = Astro.props;
             }
           </p>
         </div>
+
+        {/* Author byline — visible entity signal on every blog post */}
+        <p
+          class="max-w-3xl mx-auto mt-2 mb-3 px-4 sm:px-6 flex flex-wrap items-center gap-2 text-sm text-text-muted font-mono tracking-wide"
+        >
+          <span class="inline-flex items-center gap-2 text-text-default font-semibold">
+            <span
+              class="w-6 h-6 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold"
+            >
+              WB
+            </span>
+            By {CONTACT_INFO.name}
+          </span>
+          <span class="text-text-muted/40">·</span>
+          <span class="text-text-muted/80"
+            >{CONTACT_INFO.jobTitle.replace(' — Available for Contract', '')}, {CONTACT_INFO.location}</span
+          >
+        </p>
 
         <h1
           class="px-4 sm:px-6 max-w-3xl mx-auto text-4xl md:text-5xl font-bold leading-tighter tracking-tighter font-mono text-text-heading"

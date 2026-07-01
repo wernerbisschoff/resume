@@ -24,14 +24,14 @@ import { Icon } from 'astro-icon/components';
         </a>
       </div>
 
-      <!-- Social Links -->
+      <!-- Social Links — rel="me" enables cross-platform identity verification -->
       <div class="flex items-center gap-5">
         {
           footerData.socialLinks.map((social) => (
             <a
               href={social.href}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="me noopener noreferrer"
               aria-label={social.ariaLabel}
               class="text-text-muted/70 hover:text-primary transition-colors duration-200 group"
             >

@@ -1,8 +1,11 @@
 ---
 import { getAsset } from '~/utils/permalinks';
+import { CONTACT_INFO } from '~/config/contact';
 ---
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="author" content={CONTACT_INFO.name} />
+<meta name="theme-color" content="#599692" />
 
 <link rel="sitemap" href={getAsset('/sitemap-index.xml')} />

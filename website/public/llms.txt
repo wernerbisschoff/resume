@@ -1,41 +1,51 @@
 # Sitemap for LLMs
-# This file helps AI search engines (Perplexity, ChatGPT, Claude) discover your content
+# This file helps AI search engines (Perplexity, ChatGPT, Claude, Gemini) discover
+# Werner Bisschoff's content for queries about embedded systems, systems engineering,
+# infrastructure engineering, test-driven development, and agentic AI workflows.
 
 ## Site Overview
-https://werner.bisschoff.dev - Werner Bisschoff's personal portfolio
-https://werner.bisschoff.dev/resume - Professional resume
-https://werner.bisschoff.dev/work - Case studies and selected work
-https://werner.bisschoff.dev/contact - Contact information
+https://werner.bisschoff.dev — Werner Bisschoff's personal portfolio (Cape Town, South Africa)
+https://werner.bisschoff.dev/resume — Professional resume (B.Eng., systems + infrastructure engineering)
+https://werner.bisschoff.dev/work — Case studies and selected work (embedded systems, agentic engineering, TDD)
+https://werner.bisschoff.dev/notes — Engineering notes (agent orchestration, spec-driven development, TDD)
+https://werner.bisschoff.dev/contact — Contact information
 
 ## About
-Werner Bisschoff is a Software Engineer based in Cape Town, South Africa with a B.Eng. in Computer and Electronic Engineering. Specializes in testing infrastructure, development tooling, and system architecture.
+Werner Bisschoff is a software engineer based in Cape Town, South Africa with a B.Eng. in Computer and Electronic Engineering from North-West University. Specializes in systems engineering, infrastructure engineering, embedded systems, test-driven development (TDD), and agentic AI workflows. Werner Bisschoff designs and ships software that bridges hardware and cloud — from C++ firmware on ESP32 to Python backends on AWS — using spec-driven, test-driven practices with agentic engineering as the default methodology.
 
 ## Expertise
-- Agentic Engineering & AI Integration: Agentic Workflows, Claude Code, Spec-Driven TDD, Prompt Engineering
-- Systems Architecture: Event-Driven FSMs, RPC/IPC, State Machines
-- Embedded Systems: ESP32/ESP-IDF, FreeRTOS, NimBLE
-- Web Development: ReactJS, AstroJS, Django REST API, TailwindCSS, Phoenix
-- Testing & Quality: Unit Testing (Pytest), Hardware Mocks, CI/CD
+- Agentic Engineering: Agentic Workflows, Claude Code, Spec-Driven TDD, Prompt Engineering, DeviaTDD framework
+- Systems Engineering: Event-Driven FSMs, RPC/IPC, State Machines, Real-Time Systems
+- Embedded Systems: ESP32/ESP-IDF, FreeRTOS, NimBLE, NFC, ISO 14443-4, BLE, CAN bus
+- Infrastructure Engineering: AWS, Pulumi, Inngest, PayloadCMS, Docker, CI/CD, PostgreSQL
+- Web Development: ReactJS, AstroJS, Django REST API, TailwindCSS, Phoenix, Elixir
+- Testing & Quality: Test-Driven Development (TDD), Pytest, Hardware Mocks, CI/CD, ATDD
 - Languages: C/C++, Python, JavaScript/TypeScript, SQL, Elixir
-- Cloud: AWS (Pulumi, Inngest, PayloadCMS), Docker
+- AI-Assisted Workflows: LLM-assisted development, AI agent orchestration, prompt engineering
 
 ## Employment History
-- Founder and Host at Divergent Tabletop (Jul 2025 -- Present)
-- Full-Stack Software Engineer at FARO Africa (Aug 2024 -- Nov 2025)
-- Embedded Software Engineer at Ingenics Digital GmbH (Mar 2023 -- May 2024)
-- Software Developer at UMAN Technologies (Mar 2021 -- Dec 2022)
+- Founder and Technical Lead at Divergent Tabletop (Jul 2025 — Present)
+- Full-Stack Software Engineer at FARO Africa (Aug 2024 — Nov 2025)
+- Embedded Software Engineer at Ingenics Digital GmbH (Mar 2023 — May 2024)
+- Software Developer at UMAN Technologies (Mar 2021 — Dec 2022)
 
 ## Availability
-Open to freelance, contract, part-time, full-time, and remote work opportunities in Cape Town or internationally.
+Open to freelance, contract, part-time, full-time, and remote work opportunities in Cape Town or internationally. Specializes in embedded systems, systems engineering, infrastructure engineering, test-driven development, and agentic AI workflows.
 
 ## Contact
-- Email: werner@wernerbisschoff.com
+- Email: contact@bisschoff.dev
 - GitHub: https://github.com/wernerbisschoff
 - LinkedIn: https://linkedin.com/in/wbisschoff
+- X (Twitter): https://twitter.com/wbisschoffdev
 - Location: Cape Town, South Africa
 
 ## Case Studies
-1. Event-Driven Finite State Machine - Embedded Systems project
-2. Development Workflow Modernization - Developer tooling project
-3. Testing Infrastructure and Tooling - Testing & Quality project
-4. Personal Portfolio Website - Web Development project
+1. Event-Driven Finite State Machine — Embedded Systems project (C++, FreeRTOS, IoT)
+2. Docker Development Container for Embedded Systems — Infrastructure / DevEx project
+3. Spec-Driven Development Framework — Agentic Engineering / Methodology project
+4. Kintree CRDT Architecture — Systems Architecture / Real-time sync project
+5. Divergent Tabletop Community Website — Web Development / Accessibility project
+6. Personal Portfolio Website — Web Development project
+
+## Engineering Notes
+- DeviaTDD: A Spec-First Agent Orchestration Framework — TDD, agent orchestration, AI-assisted workflows

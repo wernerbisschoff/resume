@@ -35,7 +35,10 @@ if (publishedPosts.length === 0) {
 // const allTags = await findTags();
 
 const metadata = {
-  title: `Notes${currentPage > 1 ? ` — Page ${currentPage}` : ''}`,
+  title: `Werner Bisschoff — Notes${currentPage > 1 ? ` — Page ${currentPage}` : ''}`,
+  description:
+    'Engineering notes by Werner Bisschoff on systems engineering, infrastructure engineering, embedded systems, test-driven development, and agentic AI workflows.',
+  ignoreTitleTemplate: true,
   robots: {
     index: blogListRobots?.index && currentPage === 1,
     follow: blogListRobots?.follow,

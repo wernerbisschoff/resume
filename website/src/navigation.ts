@@ -25,8 +25,12 @@ export const footerData = {
       icon: CONTACT_INFO.social.linkedin.icon,
       href: CONTACT_INFO.social.linkedin.url,
     },
+    {
+      ariaLabel: 'X (Twitter)',
+      icon: 'tabler:brand-x',
+      href: CONTACT_INFO.social.twitter.url,
+    },
   ],
-  // footNote: '© 2026 Werner Bisschoff. All rights reserved.',
   links: [],
   secondaryLinks: [],
 };
