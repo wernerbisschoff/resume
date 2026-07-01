@@ -8,7 +8,6 @@ tags:
   - deviatdd
   - tdd
   - agent-orchestration
-author: Werner Bisschoff
 ---
 
 I kept watching the same pattern: AI agents stop at generation. The code compiles, the tests go green, the diff lands. Verification stays a post-hoc audit, not a structural property of the loop.

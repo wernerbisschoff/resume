@@ -27,8 +27,6 @@ export interface Post {
   category?: Taxonomy;
   /**  */
   tags?: Taxonomy[];
-  /**  */
-  author?: string;
 
   /**  */
   metadata?: MetaData;
