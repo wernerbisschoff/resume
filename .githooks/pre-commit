@@ -11,8 +11,9 @@ echo "🔍 Running pre-commit checks..."
 echo "--- CV Project (Typst) ---"
 cd "$ROOT" && mise run check
 
-# Website (Astro)
+# Website (Astro) — check + production build (Layout slot rendering)
 echo "--- Website (Astro) ---"
 cd "$ROOT/website" && mise run check
+cd "$ROOT/website" && npm run build > /tmp/website-build.log 2>&1 || { cat /tmp/website-build.log; exit 1; }
 
 echo "✅ Pre-commit checks passed"
