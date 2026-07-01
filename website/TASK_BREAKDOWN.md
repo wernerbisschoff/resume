@@ -283,7 +283,7 @@ TM-010 (Accessibility & Performance) ←─┘
 - Form validation: Required fields, email format
 - Form submissions → werner@bisschoff.dev
 - Display email: werner@bisschoff.dev
-- Social links: LinkedIn (wbisschoff13), GitHub (wbisschoff13)
+- Social links: LinkedIn (wbisschoff), GitHub (wbisschoff13)
 - No phone number (email only)
 
 **Test Strategy**:

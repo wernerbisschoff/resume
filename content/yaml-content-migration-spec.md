@@ -55,7 +55,7 @@ phone: "071 826 2066"
 location: "Cape Town, Western Cape, South Africa"
 github: "wbisschoff13"
 website: "https://werner.bisschoff.dev"
-linkedin: "wbisschoff13"
+linkedin: "wbisschoff"
 
 # Position title per variant
 position:

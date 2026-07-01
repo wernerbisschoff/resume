@@ -55,8 +55,8 @@ export const CONTACT_INFO = {
       icon: 'tabler:brand-github',
     },
     linkedin: {
-      url: 'https://linkedin.com/in/wbisschoff13',
-      username: 'wbisschoff13',
+      url: 'https://linkedin.com/in/wbisschoff',
+      username: 'wbisschoff',
       icon: 'tabler:brand-linkedin',
     },
     twitter: {
