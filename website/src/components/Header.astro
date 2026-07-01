@@ -21,7 +21,7 @@ const isActive = (href: string) => {
 
 // Get published blog posts to determine if Notes link should be shown
 const allPosts = await getCollection('post');
-const publishedPosts = allPosts.filter((post) => post.data.draft !== true);
+const publishedPosts = allPosts.filter((post) => import.meta.env.DEV || post.data.draft !== true);
 const showNotesLink = publishedPosts.length > 0;
 
 // Filter navigation links to exclude Notes if no published posts

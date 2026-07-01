@@ -24,7 +24,7 @@ const currentPage = page.currentPage ?? 1;
 
 // Check if there are any published blog posts
 const allPosts = await getCollection('post');
-const publishedPosts = allPosts.filter((post) => post.data.draft !== true);
+const publishedPosts = allPosts.filter((post) => import.meta.env.DEV || post.data.draft !== true);
 
 // Return 404 if no published posts
 if (publishedPosts.length === 0) {
@@ -50,9 +50,9 @@ const metadata = {
   <section class="px-6 sm:px-6 py-12 sm:py-16 lg:py-20 mx-auto max-w-4xl">
     <ScrollReveal direction="up" delay={0} duration={0.6}>
       <Headline
-        subtitle="A statically generated blog example with news, tutorials, resources and other interesting content related to AstroWind"
+        subtitle="Engineering notes on the foundations that help teams ship reliable software — systems, infrastructure, and tooling."
       >
-        The Blog
+        Notes
       </Headline>
     </ScrollReveal>
     <BlogList posts={page.data} />
