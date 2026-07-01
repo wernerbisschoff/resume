@@ -43,8 +43,13 @@ description = "Validate all Typst source files compile without errors"
 run = "typst compile --font-path fonts cv.typ /dev/null && typst compile --font-path fonts cv_systems.typ /dev/null && typst compile --font-path fonts cv_infrastructure.typ /dev/null && typst compile --font-path fonts cover_letter.typ /dev/null"
 
 [tasks.dev]
-description = "Watch and recompile general CV on changes"
-run = "typst watch --font-path fonts cv.typ W_Bisschoff_CV.pdf"
+description = "Watch general CV and run Astro dev server (Ctrl-C stops both)"
+run = """
+typst watch --font-path fonts cv.typ W_Bisschoff_CV.pdf &
+TYPST_PID=$!
+trap 'kill $TYPST_PID 2>/dev/null' EXIT INT TERM
+cd website && pnpm dev
+"""
 
 [tasks.dev-systems]
 description = "Watch and recompile systems CV on changes"
