@@ -11,5 +11,9 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    { "source": "/blog", "destination": "/notes", "statusCode": 301 },
+    { "source": "/blog/:path*", "destination": "/notes/:path*", "statusCode": 301 }
   ]
 }
