@@ -6,9 +6,10 @@ import fs from 'node:fs';
 import yaml from 'js-yaml';
 
 const metadata = {
-  title: 'Work — Werner Bisschoff',
+  title: 'Werner Bisschoff — Selected Work',
   description:
-    'Case studies from a freelance software engineer and contractor. Embedded systems, performance optimization, CRDT architecture, NFC hardware, and spec-driven development. Available for contract work.',
+    'Werner Bisschoff is a Cape Town software engineer whose case studies span systems engineering, infrastructure engineering, embedded systems, and test-driven development with agentic AI workflows. Available for contract and remote work.',
+  ignoreTitleTemplate: true,
 };
 
 // Load canonical data from YAML
@@ -176,9 +177,11 @@ const caseStudies: CaseStudy[] = featuredMappings.map((mapping) => {
         >
           CASE STUDIES
         </span>
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-text-heading mb-6">Selected Work</h1>
-        <p class="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-          Engineering projects showcasing systems performance, embedded systems, and web development.
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-text-heading mb-6">
+          Werner Bisschoff — Selected Work
+        </h1>
+        <p class="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed mb-6">
+          Selected projects spanning embedded systems, infrastructure engineering, and agentic AI workflows.
         </p>
       </div>
     </ScrollReveal>

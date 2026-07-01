@@ -5,11 +5,11 @@ import fs from 'node:fs';
 import yaml from 'js-yaml';
 
 const metadata = {
-  title: 'Resume — Werner Bisschoff',
+  title: 'Werner Bisschoff — Resume',
   description:
-    'Professional resume showcasing experience in systems architecture, testing infrastructure, and development tooling. Open to freelance, contract, part-time, full-time, and remote work in Cape Town.',
+    'Werner Bisschoff is a Cape Town software engineer with a B.Eng. in Computer and Electronic Engineering. Resume covers systems engineering, infrastructure engineering, embedded systems, test-driven development, and agentic AI workflows. Open to freelance, contract, part-time, full-time, and remote work.',
+  ignoreTitleTemplate: true,
 };
-
 interface Config {
   name: string;
   title: Record<string, string>;
@@ -109,11 +109,19 @@ const titleText = config?.title?.general || 'Software Engineer';
         </div>
       </ScrollReveal>
     </section>
-
-    <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <!-- Education Section -->
+      <section class="mb-12 p-6 bg-bg-element/30 border border-border/[0.06] rounded-sm">
+        <p class="text-text-muted text-base leading-relaxed">
+          Practice anchored in
+          <strong class="text-text-default">test-driven development</strong>,
+          <strong class="text-text-default">systems engineering</strong>, and
+          <strong class="text-text-default">agentic AI workflows</strong> — across embedded firmware, cloud infrastructure,
+          and tooling.
+        </p>
+      </section>
+
       <section class="mb-16">
+        <!-- Education Section -->
         <ScrollReveal direction="up" delay={0.1} duration={0.6}>
           <h2 class="text-2xl font-heading font-bold text-text-heading mb-6 pb-2 border-b-2 border-primary">
             Education
