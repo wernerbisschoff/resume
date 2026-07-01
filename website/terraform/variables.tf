@@ -44,7 +44,7 @@ variable "subdomain_name" {
 variable "repo_owner" {
   description = "GitHub repository owner (username or organization)"
   type        = string
-  default     = "wbisschoff13"
+  default     = "wernerbisschoff"
 }
 
 variable "repo_name" {

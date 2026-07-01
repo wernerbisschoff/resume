@@ -36,7 +36,7 @@ export const CONTACT_INFO = {
 
   // Resume PDF
   resume: {
-    pdfUrl: 'https://github.com/wbisschoff13/resume/releases/latest/download/W_Bisschoff_CV.pdf',
+    pdfUrl: 'https://github.com/wernerbisschoff/resume/releases/latest/download/W_Bisschoff_CV.pdf',
   },
 
   // Education
@@ -50,8 +50,8 @@ export const CONTACT_INFO = {
   // Social links
   social: {
     github: {
-      url: 'https://github.com/wbisschoff13',
-      username: 'wbisschoff13',
+      url: 'https://github.com/wernerbisschoff',
+      username: 'wernerbisschoff',
       icon: 'tabler:brand-github',
     },
     linkedin: {

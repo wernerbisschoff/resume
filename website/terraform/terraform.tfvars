@@ -23,7 +23,7 @@ subdomain_name = "werner"
 # GitHub Repository Configuration
 # -----------------------------------------------------------------------------
 
-repo_owner        = "wbisschoff13"
+repo_owner        = "wernerbisschoff"
 repo_name         = "resume"
 production_branch = "main"
 
