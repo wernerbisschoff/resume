@@ -6,12 +6,14 @@ site:
 
   googleSiteVerificationId: orcPxI47GSa-cRvY11tUe6iGg2IO_RPvnA1q95iEM3M
 
-# Default SEO metadata
+# Default SEO metadata — pages provide their own full title via frontmatter
+# metadata.title with `ignoreTitleTemplate: true`. The template here is the
+# minimal fallback when a page omits a title.
 metadata:
   title:
     default: Werner Bisschoff — Software Engineer
     template: '%s — Werner Bisschoff'
-  description: 'Software Engineer based in Cape Town, South Africa. I build the foundations teams need to ship reliable software fast. Specializing in testing infrastructure, development tooling, and system architecture.'
+  description: 'Werner Bisschoff is a software engineer in Cape Town, South Africa — embedded systems, systems engineering, infrastructure engineering, test-driven development, and agentic AI workflows. Open to freelance, contract, and remote work internationally.'
   robots:
     index: true
     follow: true

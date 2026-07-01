@@ -21,7 +21,9 @@ const { page, category } = Astro.props as Props;
 const currentPage = page.currentPage ?? 1;
 
 const metadata = {
-  title: `Category '${category.title}' ${currentPage > 1 ? ` — Page ${currentPage}` : ''}`,
+  title: `Werner Bisschoff — ${category.title} Notes${currentPage > 1 ? ` — Page ${currentPage}` : ''}`,
+  description: `Werner Bisschoff's engineering notes in the ${category.title} category — systems engineering, infrastructure engineering, embedded systems, and agentic AI workflows.`,
+  ignoreTitleTemplate: true,
   robots: {
     index: blogCategoryRobots?.index,
     follow: blogCategoryRobots?.follow,

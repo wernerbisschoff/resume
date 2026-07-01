@@ -21,7 +21,9 @@ const { page, tag } = Astro.props as Props;
 const currentPage = page.currentPage ?? 1;
 
 const metadata = {
-  title: `Posts by tag '${tag.title}'${currentPage > 1 ? ` — Page ${currentPage} ` : ''}`,
+  title: `Werner Bisschoff — Notes tagged '${tag.title}'${currentPage > 1 ? ` — Page ${currentPage} ` : ''}`,
+  description: `Werner Bisschoff's engineering notes tagged '${tag.title}' — covering systems engineering, infrastructure engineering, embedded systems, test-driven development, and agentic AI workflows.`,
+  ignoreTitleTemplate: true,
   robots: {
     index: blogTagRobots?.index,
     follow: blogTagRobots?.follow,
