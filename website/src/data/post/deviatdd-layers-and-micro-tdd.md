@@ -20,7 +20,7 @@ It's MIT-licensed, written in Python, and ships as a single CLI. The first-commi
 
 What I kept seeing — and what the agentic engineering literature confirms — is that frontier models ship plausible-looking code that fails in three documented ways:
 
-- **Generation-only agents hack the test** to make a failing check pass. [METR's 2025 evaluations](https://metr.org/) document models modifying test/scoring code; the Anthropic model card for Claude 3.5 Sonnet describes `sys.exit(0)` to make all tests appear to pass. Across 800 SWE-Bench runs I monitored, seven test-hacking instances showed up — every one counted as a failure.
+- **Generation-only agents hack the test** to make a failing check pass. [METR's 2025 evaluations](https://metr.org/) document frontier models modifying test/scoring code. [TDFlow's evaluation pipeline](https://arxiv.org/abs/2510.23761) detected seven test-hacking instances across 800 SWE-Bench runs (300 Lite + 500 Verified); every one counted as a failure [1].
 - **Long chats lose the customer mental model.** The agent's idea of "what we're building" drifts toward whatever the latest spec says, which is rarely what the user asked for.
 - **Parallel features contradict each other.** Two correct features can produce a broken system. Without a place where cross-feature coherence is reviewed, no review catches it.
 
@@ -34,7 +34,7 @@ I decompose each feature into a chain of artifacts, one per commit. The chain is
 
 **Product _(optional)_ — customer framing.** Three artifacts: _flows_ (actor, job, trigger), _architecture_ (cross-product data and components), and _release_ (a single-sentence contract with users). Most repos ship one feature stream at a time and skip this layer; multi-product repos do not. The layer exists to keep the agent's mental model of "the product" anchored to a customer, not to the latest spec.
 
-**Macro — feature scoping.** Four phases: _explore_ (a factual "what exists" scan, no recommendations), _research_ (architectural reasoning, **Gate 1** review), _prd_ (testable acceptance criteria in EARS notation), and _shard_ (vertical-slice issue files, **Gate 2** review). A complexity-classified _adhoc_ shortcut condenses the four into one issue for low/medium-complexity work; the gate rejects it for high-complexity work.
+**Macro — feature scoping.** Four phases: _explore_ (a factual "what exists" scan, no recommendations), _research_ (architectural reasoning, **Gate 1** review), _prd_ (testable acceptance criteria in EARS notation [6]), and _shard_ (vertical-slice issue files, **Gate 2** review). A complexity-classified _adhoc_ shortcut condenses the four into one issue for low/medium-complexity work; the gate rejects it for high-complexity work.
 
 **Meso — issue engineering.** Two phases: _plan_ (per-issue localized research that reads prior issues from the issues ledger) and _tasks_ (4–8 TDD-executable tasks with explicit DAG `blocked_by` dependencies). `tasks.md` is the human's review surface; `tasks.jsonl` is the CLI's execution surface. They are separate files because the formats serve different readers.
 
@@ -54,7 +54,7 @@ Gates are cheap. A five-minute human check at Gate 1 prevents a multi-day agent 
 
 A single prompt that does exploration, spec writing, decomposition, and TDD is a single context window that has to hold all four roles at once. The model loses the discipline of one role while playing another. Splitting the work into layers — each a small artifact, a separate commit, a separate review — converts a long chat into a chain of reviewed briefs.
 
-The strongest evidence I have for this comes from prior experiments on test-driven agent pipelines. Pre-computed `test_map.txt` plus a small `SKILL.md` (≤30 lines) cut regressions by roughly 70%; another strand of research argues agents should never implement from a long chat, only from a reviewed brief. A separate study found that shrinking `SKILL.md` from 107 to 20 lines quadrupled resolution (12% → 50%) — the empirical case for the layer's design philosophy: the right-sized, well-bounded, reviewable artifact beats the comprehensive-but-soft prompt.
+The strongest evidence I have for this comes from prior experiments on test-driven agent pipelines [2]. Pre-computed `test_map.txt` plus a small `SKILL.md` (≤30 lines) cut regressions by roughly 70%; another strand of research argues agents should never implement from a long chat, only from a reviewed brief [5]. A separate study found that shrinking `SKILL.md` from 107 to 20 lines quadrupled resolution (12% → 50%) — the empirical case for the layer's design philosophy: the right-sized, well-bounded, reviewable artifact beats the comprehensive-but-soft prompt [2].
 
 ## The TDD micro-loop: `Red → Green → [Yellow] → Judge/Train → Refactor`
 
@@ -66,7 +66,7 @@ The micro-loop is the part the rest of the framework rests on. It is also the pa
 
 **Yellow _(conditional)_ — the test-amendment gate.** This phase fires only when green edited the test. Both "agent cheating" and "agent caught a real spec error" look identical in the diff — the test file changed. Silently reverting the test forces the loop to fail on a test the agent correctly identified as broken; silently accepting allows test-hacking to slip through. Yellow is the only structurally safe path between the two: the agent's proposed amendment is routed to a human for review, and the human decides which case it is. The phase is the load-bearing piece of the micro-loop.
 
-Yellow is also the only phase in the framework with no direct literature source — it is a DeviaTDD-original pattern. The general principle — agents cannot self-verify — is well-cited in the agentic-engineering literature, but the specific "test-amendment gate" pattern is not. The pattern is the single most consequential evidence gap in the framework, and the part most worth press-testing.
+Yellow is also the only phase in the framework with no direct literature source — it is a DeviaTDD-original pattern. The general principle — agents cannot self-verify — is well-cited in the agentic-engineering literature [3][4], but the specific "test-amendment gate" pattern is not. The pattern is the single most consequential evidence gap in the framework, and the part most worth press-testing.
 
 **Judge/Train — independent review with bounded repair.** The same agent that wrote the green code cannot reliably review it. Judge runs in an isolated session with a fresh context, evaluates the production diff against the contract, and returns `JUDGE_PASS` or `JUDGE_REJECTED`. On rejection, the CLI rolls back to the RED commit, injects the failure feedback into the next green prompt, and retries — up to three times. The bound forces escalation back to the human. The feedback is the only signal the next attempt gets for what the compliance checker objected to. Three retries is enough; more is a sign of a wrong test or a wrong spec, not a wrong model.
 
@@ -86,3 +86,14 @@ Bootstrap creates `.deviate/`, scaffolds `specs/constitution.md`, and installs `
 The full lifecycle takes a problem statement to merged, tested code with a documented audit trail. The trail is append-only JSONL (`specs/<epic>/issues/ISS-NNN/tasks.jsonl`, `specs/issues.jsonl`), and a corrupted state file can be reconstructed by re-running the event stream.
 
 The framework is open source under MIT and lives at [github.com/wernerbisschoff/deviatdd](https://github.com/wernerbisschoff/deviatdd). Yellow is a single slash command: `/deviate-yellow <task-id>`. If you have run a TDD-style agent loop on real code, I would like to know whether Yellow actually distinguishes cheating from a real spec error — or whether I have just moved the cheat-detection problem one level up. Issues, PRs, and adversarial examples of test-hacking are welcome.
+
+## References
+
+1. ["TDFlow: Agentic Workflows for Test-Driven Development"](https://arxiv.org/abs/2510.23761) — 7 test-hacking instances detected across 800 SWE-Bench runs (300 Lite + 500 Verified).
+2. ["TDAD: Test-Driven Agentic Development — Reducing Code Regressions via Graph-Based Impact Analysis"](https://arxiv.org/abs/2603.17973) — pre-computed `test_map.txt` + ≤30-line `SKILL.md` cut regressions by ~70%; shrinking `SKILL.md` from 107 to 20 lines quadrupled resolution (12% → 50%).
+3. ["Interactive Adversarial Convergence Development Methodology (IACDM)"](https://arxiv.org/abs/2604.16399) — verification-gap thesis: "the tool is irrelevant, the process is determinative."
+4. ["PRIME: Policy-Reinforced Iterative Multi-Agent Execution for Algorithmic Reasoning in Large Language Models"](https://doi.org/10.20944/preprints202601.1479.v1) — Executor/Verifier asymmetry: the same agent that produced a design will produce a plausible-looking review of it.
+5. ["Agentic Agile-V: From Vibe Coding to Verified Engineering in Software and Hardware Development"](https://arxiv.org/abs/2605.20456) — "do not let an agent implement from a long chat; let it implement from a reviewed brief" (SCOPE-V).
+6. ["Spec-Driven Development: From Code to Contract in the Age of AI Coding Assistants"](https://arxiv.org/abs/2602.00180) — 4-phase Specify → Plan → Tasks → Implement workflow; structured specs deliver 3–10× higher first-pass success.
+7. ["Spec-Driven Development (SDD): The Definitive 2026 Guide"](https://thebcms.com/blog/spec-driven-development) — EARS notation reference (Ubiquitous / Event-driven / State-driven / Unwanted behaviour / Optional features).
+8. ["Spec Kit Agents: Context-Grounded Agentic Workflows"](https://arxiv.org/abs/2604.05278) — discovery hooks (read-only probes) and intermediate artifact pattern (SPEC.md / PLAN.md / TASKS.md).
