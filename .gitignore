@@ -34,7 +34,7 @@ thoughts/
 
 # Generated PDF artifacts (root-level only)
 W_Bisschoff_CV*.pdf
-W_Bisschoff_Cover_Letter.pdf
+W_Bisschoff_Cover_Letter*.pdf
 
 # TDD session artifacts
 .tdd-session.json

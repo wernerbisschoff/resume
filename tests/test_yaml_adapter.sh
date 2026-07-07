@@ -26,7 +26,9 @@ ENTRY_POINTS=(
   cv.typ
   cv_systems.typ
   cv_infrastructure.typ
+  cv_head_of_systems.typ
   cover_letter.typ
+  cover_letter_head_of_systems.typ
 )
 
 # --- Phase 1: Broken YAML stub must fail compilation ---

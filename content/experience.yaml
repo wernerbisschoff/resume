@@ -6,12 +6,13 @@
     general: "Founder & Technical Lead"
     systems: "Principal Systems Architect"
     infrastructure: "Principal Systems Architect"
-  start_date: "Jul 2025"
+    head_of_systems: "Founder / Principal Systems Architect"
   end_date: null
   variant_tags:
     - "general"
     - "systems"
     - "infrastructure"
+    - "head_of_systems"
   bullets:
     - text: "Founded neurodivergent-focused peer community; manage event operations and WhatsApp-based community platform."
       variant: "general"
@@ -58,6 +59,21 @@
       cv_priority: 1
       website_show: true
       star_ref: null
+    - text: "Founded and lead a community-focused organisation, building the operational and technical systems required to support structured collaboration across neurodiverse groups."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Designed accessible workflows, documentation, and low-context operating practices to reduce cognitive friction and improve participation for users with differing accessibility and executive-function needs."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Combined technical architecture with practical service design, ensuring systems were reliable for users rather than only elegant in implementation."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
 
 - id: faro-africa
   company: "FARO Africa"
@@ -66,12 +82,14 @@
     general: "Full-Stack Software Engineer"
     systems: "Embedded Systems & Integration Engineer"
     infrastructure: "Full-Stack ERPNext & Automation Engineer"
+    head_of_systems: "Full-Stack ERPNext Automation Engineer"
   start_date: "Aug 2024"
   end_date: "Nov 2025"
   variant_tags:
     - "general"
     - "systems"
     - "infrastructure"
+    - "head_of_systems"
   bullets:
     - text: "Extended ERPNext using Python/JavaScript to improve workflows, pricing logic, and operational reporting (SQL) → reduced manual reporting time and improved data accuracy."
       variant: "general"
@@ -133,6 +151,31 @@
       cv_priority: 3
       website_show: true
       star_ref: null
+    - text: "Customised and extended ERPNext/Frappe using Python and JavaScript hooks to improve pricing workflows, internal business processes, and reporting accuracy."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Identified UX and process issues driving repeated user errors, then redesigned workflows to reduce task time and error rates for operational users."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Refactored reporting and business logic to improve data visibility and support better operational decision-making."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Provisioned secure Linux-based infrastructure with Docker Compose, including backup and monitoring scripts to improve reliability and maintainability."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Helped bridge the gap between technical implementation and day-to-day user needs by translating operational pain points into practical systems changes."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
 
 - id: ingenics-digital
   company: "Ingenics Digital GmbH (through ViVa Outsourcing)"
@@ -141,12 +184,14 @@
     general: "Embedded Software Engineer"
     systems: "Firmware Engineer (Contract)"
     infrastructure: "Enterprise Infrastructure & Tooling Engineer"
+    head_of_systems: "Embedded Tooling & Automation Engineer"
   start_date: "Mar 2023"
   end_date: "May 2024"
   variant_tags:
     - "general"
     - "systems"
     - "infrastructure"
+    - "head_of_systems"
   bullets:
     - text: "Designed event-driven FSM for I2C-based embedded system (C++/FreeRTOS) → maintainable architecture, fewer bugs."
       variant: "general"
@@ -193,6 +238,11 @@
       cv_priority: 1
       website_show: true
       star_ref: null
+    - text: "Built internal Python tooling for configuration schema validation and serial/BLE communication, automating manual setup work for distributed teams."
+      variant: "head_of_systems"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
 
 - id: uman-technologies
   company: "UMAN Technologies"
@@ -201,12 +251,14 @@
     general: "Software Developer"
     systems: "Software Developer"
     infrastructure: "Infrastructure & Tooling Developer"
+    head_of_systems: "Software & Tooling Developer"
   start_date: "Mar 2021"
   end_date: "Dec 2022"
   variant_tags:
     - "general"
     - "systems"
     - "infrastructure"
+    - "head_of_systems"
   bullets:
     - text: "Implemented SOME/IP RPC services; optimized performance bottlenecks with perf."
       variant: "general"
@@ -235,6 +287,11 @@
       star_ref: null
     - text: "Created a Docker dev container replicating the hardware environment — including VLAN and networking — reducing setup from hours to under an hour for remote teams."
       variant: "infrastructure"
+      cv_priority: 1
+      website_show: true
+      star_ref: null
+    - text: "Built Python-based SOME/IP hardware mocks integrated into CI, automating testing infrastructure and reducing manual hardware setup for distributed teams."
+      variant: "head_of_systems"
       cv_priority: 1
       website_show: true
       star_ref: null

@@ -21,8 +21,12 @@ jobs:
             output: W_Bisschoff_CV_systems.pdf
           - source: cv_infrastructure.typ
             output: W_Bisschoff_CV_infrastructure.pdf
+          - source: cv_head_of_systems.typ
+            output: W_Bisschoff_CV_head_of_systems.pdf
           - source: cover_letter.typ
             output: W_Bisschoff_Cover_Letter.pdf
+          - source: cover_letter_head_of_systems.typ
+            output: W_Bisschoff_Cover_Letter_head_of_systems.pdf
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -86,6 +90,8 @@ jobs:
             - **W_Bisschoff_CV_systems.pdf** - Tailored for systems/edge
             - **W_Bisschoff_CV_infrastructure.pdf** - Tailored for infrastructure/cloud
             - **W_Bisschoff_Cover_Letter.pdf** - Professional cover letter
+            - **W_Bisschoff_CV_head_of_systems.pdf** - Tailored for Head of Systems roles
+            - **W_Bisschoff_Cover_Letter_head_of_systems.pdf** - Head of Systems cover letter
           draft: false
           prerelease: false
         env:

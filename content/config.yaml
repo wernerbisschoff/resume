@@ -4,6 +4,7 @@ title:
   general: "Hybrid Systems & Platform Engineer"
   systems: "Hybrid Edge/Systems Engineer"
   infrastructure: "Cloud Infrastructure Engineer / Platform Developer"
+  head_of_systems: "Systems & Infrastructure Engineer"
 
 contact:
   email: "werner@bisschoff.dev"
@@ -28,6 +29,15 @@ summary:
     high-availability infrastructure across Linux systems administration, Docker containerization,
     and Pulumi infrastructure-as-code. Proven track record in PostgreSQL performance tuning,
     multi-tenant data isolation, and building resilient automation and deployment pipelines.
+  head_of_systems: >
+    Systems and infrastructure professional with 5 years of experience improving business-critical
+    platforms, automating workflows, and stabilising complex operational environments.
+    Strong track record of translating operational problems into practical system changes —
+    ERPNext/Frappe customisation, Python automation, Linux infrastructure, reporting, and process
+    improvement across cross-functional teams.
+    Founder of Divergent Tabletop, with hands-on experience designing accessible systems for neurodiverse
+    groups. Motivated to apply this experience in a guest-focused environment where reliability,
+    usability, and cross-team coordination have direct commercial impact.
 
 ai_policy:
   - >
@@ -74,6 +84,10 @@ cover_letter:
       I am writing to explore the Enterprise Systems Architect position at [Company]. I bring over
       5 years of experience designing robust business automation engines, multi-tenant database
       infrastructures, and scalable custom extensions within the ERPNext/Frappe ecosystem.
+    head_of_systems: >
+      I'm applying for the Head of Systems role. My background is in business systems, ERP
+      customisation, Linux infrastructure, and automation — five years of work spanning ERPNext,
+      Python, and operational tooling across cross-functional teams.
 
   why_me:
     general:
@@ -120,6 +134,21 @@ cover_letter:
         heavy user concurrency. Additionally, my background at FARO Africa includes leading the
         migration of business workflows from Retool into custom Expo mobile environments,
         significantly lowering operational latency and eliminating third-party licensing dependencies.
+    head_of_systems:
+      - >
+        At FARO Africa, I extended ERPNext/Frappe with Python and JavaScript, redesigned
+        workflows that were causing repeat user errors, and provisioned the Linux infrastructure
+        that runs the platform. That mix of ERP depth, user-focused problem solving, and
+        infrastructure ownership is what this role is asking for.
+      - >
+        I also lead a community serving neurodiverse adults, where I've built both the technical
+        and operational foundations from scratch. Accessibility is a core design requirement
+        there, not an afterthought — which has sharpened my ability to design systems people
+        actually use.
+      - >
+        What draws me to this role is the breadth: owning a central platform, integrating finance
+        and PMS, leading reporting, supporting end users across departments. That's the work I
+        do best.
 
   how_i_work:
     general:
@@ -137,3 +166,10 @@ cover_letter:
         I execute tasks using strict Spec-Driven Development frameworks to deliver highly
         maintainable codebases that align perfectly with business goals. I am eager to help
         optimize and scale [Company]'s enterprise core.
+    head_of_systems:
+      - >
+        I'd start by listening — understanding your current systems landscape before
+        recommending anything. Then quick wins in workflow and reporting, then a longer roadmap
+        for resilience and adoption.
+      - >
+        Thanks for reading. I'd welcome a conversation.

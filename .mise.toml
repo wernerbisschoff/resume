@@ -7,7 +7,7 @@ node = "22.13.0"
 
 [tasks.build]
 description = "Compile all Typst documents to PDF"
-run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf"
+run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cv_head_of_systems.typ W_Bisschoff_CV_head_of_systems.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf && typst compile --font-path fonts cover_letter_head_of_systems.typ W_Bisschoff_Cover_Letter_head_of_systems.pdf"
 
 [tasks.build-cv]
 description = "Compile general CV only"
@@ -21,13 +21,21 @@ run = "typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf
 description = "Compile infrastructure CV variant"
 run = "typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf"
 
+[tasks.build-head-of-systems]
+description = "Compile Head of Systems CV variant"
+run = "typst compile --font-path fonts cv_head_of_systems.typ W_Bisschoff_CV_head_of_systems.pdf"
+
 [tasks.build-cover-letter]
 description = "Compile cover letter"
 run = "typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf"
 
+[tasks.build-cover-letter-head-of-systems]
+description = "Compile Head of Systems cover letter"
+run = "typst compile --font-path fonts cover_letter_head_of_systems.typ W_Bisschoff_Cover_Letter_head_of_systems.pdf"
+
 [tasks.build-check]
 description = "Validate all documents compile without errors"
-run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf"
+run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cv_head_of_systems.typ W_Bisschoff_CV_head_of_systems.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf && typst compile --font-path fonts cover_letter_head_of_systems.typ W_Bisschoff_Cover_Letter_head_of_systems.pdf"
 
 [tasks.check-yaml]
 description = "Validate YAML files"
@@ -39,11 +47,11 @@ depends = ["check-yaml", "check-compile"]
 
 [tasks.check-compile]
 description = "Verify all documents compile without errors"
-run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf"
+run = "typst compile --font-path fonts cv.typ W_Bisschoff_CV.pdf && typst compile --font-path fonts cv_systems.typ W_Bisschoff_CV_systems.pdf && typst compile --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infrastructure.pdf && typst compile --font-path fonts cv_head_of_systems.typ W_Bisschoff_CV_head_of_systems.pdf && typst compile --font-path fonts cover_letter.typ W_Bisschoff_Cover_Letter.pdf && typst compile --font-path fonts cover_letter_head_of_systems.typ W_Bisschoff_Cover_Letter_head_of_systems.pdf"
 
 [tasks.lint]
 description = "Validate all Typst source files compile without errors"
-run = "typst compile --font-path fonts cv.typ /dev/null && typst compile --font-path fonts cv_systems.typ /dev/null && typst compile --font-path fonts cv_infrastructure.typ /dev/null && typst compile --font-path fonts cover_letter.typ /dev/null"
+run = "typst compile --font-path fonts cv.typ /dev/null && typst compile --font-path fonts cv_systems.typ /dev/null && typst compile --font-path fonts cv_infrastructure.typ /dev/null && typst compile --font-path fonts cv_head_of_systems.typ /dev/null && typst compile --font-path fonts cover_letter.typ /dev/null && typst compile --font-path fonts cover_letter_head_of_systems.typ /dev/null"
 
 [tasks.dev]
 description = "Watch general CV and run Astro dev server (Ctrl-C stops both)"
@@ -64,7 +72,7 @@ run = "typst watch --font-path fonts cv_infrastructure.typ W_Bisschoff_CV_infras
 
 [tasks.clean]
 description = "Remove generated PDF artifacts"
-run = "rm -f W_Bisschoff_CV.pdf W_Bisschoff_CV_systems.pdf W_Bisschoff_CV_infrastructure.pdf W_Bisschoff_Cover_Letter.pdf"
+run = "rm -f W_Bisschoff_CV.pdf W_Bisschoff_CV_systems.pdf W_Bisschoff_CV_infrastructure.pdf W_Bisschoff_CV_head_of_systems.pdf W_Bisschoff_Cover_Letter.pdf W_Bisschoff_Cover_Letter_head_of_systems.pdf"
 
 [tasks.setup]
 description = "Install all tools and dependencies for both projects"

@@ -4,7 +4,7 @@
 #let _skills = yaml("skills.yaml")
 #let _projects = yaml("projects.yaml")
 
-#let _variants = ("general", "systems", "infrastructure")
+#let _variants = ("general", "systems", "infrastructure", "head_of_systems")
 
 #let _init_variant_dict(f) = {
   let d = (:)

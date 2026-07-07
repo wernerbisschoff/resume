@@ -642,7 +642,7 @@
 /// Styling for resume skill values/items
 /// - values (array): The skills to display
 #let resume-skill-values(values) = {
-  set text(size: 11pt, style: "normal")
+  set text(size: 10pt, style: "normal")
   // This is a list so join by comma (,)
   values.join(", ")
 }

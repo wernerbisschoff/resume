@@ -106,6 +106,7 @@
       #v(0.1cm)
     ]
 
+
     #if filtered_skills.len() > 0 [
       = Skills
       #for cat in filtered_skills [
@@ -152,7 +153,9 @@
 ]
 }
 
-#let render_cover_letter(data, variant: "general") = {
+#let render_cover_letter(data, variant: "general", applying_for: none) = {
+  let position = _resolve(data.at("position", default: none), variant)
+  let letter_position = if applying_for != none { applying_for } else { position }
   let name = data.at("name", default: "")
   let name_parts = name.split(" ")
   let firstname = name_parts.first()
@@ -187,8 +190,8 @@
   )
 
   cfg[
-    #if position != none [
-      #letter-heading(job-position: position, addressee: "Hiring Manager")
+    #if letter_position != none [
+      #letter-heading(job-position: letter_position, addressee: "Hiring Manager")
     ]
 
     #if about_me != none [

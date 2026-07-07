@@ -97,3 +97,49 @@
     - "SSH Networking"
     - "Spec-Driven Development (SDD)"
   variant: "infrastructure"
+
+- category: "Business systems"
+  items:
+    - "ERPNext/Frappe"
+    - "Workflow config"
+    - "Systems admin"
+    - "User access"
+    - "Process mapping"
+  variant: "head_of_systems"
+
+- category: "Automation"
+  items:
+    - "Python"
+    - "JavaScript"
+    - "API/server hooks"
+    - "Data pipelines"
+    - "Process automation"
+  variant: "head_of_systems"
+
+- category: "Reporting"
+  items:
+    - "BI reports"
+    - "Dashboards"
+    - "SQL/PostgreSQL"
+    - "Data quality"
+    - "Management reports"
+  variant: "head_of_systems"
+
+- category: "Infrastructure"
+  items:
+    - "Linux admin"
+    - "Docker"
+    - "Backups"
+    - "Monitoring"
+    - "Cloud services"
+    - "Security & access"
+  variant: "head_of_systems"
+
+- category: "Stakeholders"
+  items:
+    - "Vendor coordination"
+    - "User support"
+    - "Training"
+    - "Documentation"
+    - "Cross-functional work"
+  variant: "head_of_systems"
