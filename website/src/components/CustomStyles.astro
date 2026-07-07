@@ -1,21 +1,29 @@
 ---
-import '@fontsource-variable/inter';
-import '@fontsource-variable/azeret-mono';
+import '@fontsource-variable/geist-mono';
 ---
 
 <!-- Typography and theme styles -->
 <style is:inline>
   /*
-   * FONT STRATEGY: "The Technical Manifest" (Full Mono Headings)
+   * FONT STRATEGY: "The Technical Manifest" (Geist-only)
    * -----------------------------------------------------------
-   * H1-H3: Azeret Mono - Pure engineering identity, zero filler
-   * Body: Inter Variable - High-readability content for long-form reading
-   * Nav/Labels/Buttons: Azeret Mono - Professional, consistent interface
+   * All headings (h1-h3, .font-heading): Geist Pixel Circle - pixel display
+   * Everything else (body, nav, buttons, code, labels): Geist Mono Variable
    */
+
+  /* Geist Pixel Circle - Display headings (pixel typeface, single weight) */
+  @font-face {
+    font-family: 'Geist Pixel Circle';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url('/fonts/geist-pixel/GeistPixel-Circle.woff2') format('woff2');
+  }
+
   :root {
-    --aw-font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-    --aw-font-heading: 'Azeret Mono Variable', 'Azeret Mono', monospace;
-    --aw-font-mono: 'Azeret Mono Variable', 'Azeret Mono', monospace;
+    --aw-font-sans: 'Geist Mono Variable', 'Geist Mono', monospace;
+    --aw-font-heading: 'Geist Pixel Circle', 'Geist Mono Variable', monospace;
+    --aw-font-mono: 'Geist Mono Variable', 'Geist Mono', monospace;
 
     /* Letter spacing tokens - Precision tuning */
     --aw-tracking-tighter: -0.05em;
@@ -35,32 +43,26 @@ import '@fontsource-variable/azeret-mono';
     line-height: 1.6;
   }
 
-  /* Global Heading Strategy - Full Mono Manifest */
+  /* Global Heading Strategy - Geist Pixel for ALL headings */
 
-  /* H1: Azeret Mono - Massive Impact, Extra Bold, All Lowercase */
+  /* H1: Geist Pixel Circle - Display heading, regular weight (no variant axis) */
   h1,
   .h1 {
     font-family: var(--aw-font-heading) !important;
-    font-weight: 800;
+    font-weight: 400 !important;
     letter-spacing: 0.02em; /* Slightly positive tracking for that terminal look */
     line-height: 1.05;
     text-transform: lowercase; /* FORCED LOWERCASE */
-    font-variation-settings: 'wght' 800;
   }
 
-  h1:hover {
-    font-variation-settings: 'wght' 700;
-    transition: font-variation-settings 0.3s ease;
-  }
-
-  /* H2, H3: Azeret Mono - Structural, All Lowercase */
+  /* H2, H3, .font-heading: Geist Pixel Circle - Structural headings */
   h2,
   h3,
   .h2,
   .h3,
   [class*='font-heading']:not(h1):not(.h1) {
-    font-family: var(--aw-font-mono) !important;
-    font-weight: 700;
+    font-family: var(--aw-font-heading) !important;
+    font-weight: 400 !important;
     letter-spacing: var(--aw-tracking-tight);
     text-transform: lowercase; /* FORCED LOWERCASE */
   }
@@ -80,17 +82,24 @@ import '@fontsource-variable/azeret-mono';
     line-height: 1.4;
   }
 
-  /* Technical & Actionable elements - Clean, high-tech interface */
+  /* Geist Mono - Code/inline-monospace utility classes */
   .font-mono,
   code,
   pre,
-  .btn,
-  button,
-  nav a,
   .badge,
   label,
   .text-mono {
     font-family: var(--aw-font-mono);
+    font-weight: 500;
+    letter-spacing: var(--aw-tracking-normal);
+    text-transform: lowercase; /* FORCED LOWERCASE */
+  }
+
+  /* Geist Pixel - Nav links and buttons */
+  nav a,
+  .btn,
+  button {
+    font-family: var(--aw-font-heading) !important;
     font-weight: 500;
     letter-spacing: var(--aw-tracking-normal);
     text-transform: lowercase; /* FORCED LOWERCASE */
@@ -105,9 +114,9 @@ import '@fontsource-variable/azeret-mono';
     border-radius: 0.125rem;
   }
 
-  /* Navigation - Sleek, low-level feel */
+  /* Navigation - Regular weight, low-level feel */
   nav a {
-    font-weight: 600;
+    font-weight: 400;
     text-transform: lowercase;
     letter-spacing: var(--aw-tracking-normal);
   }
