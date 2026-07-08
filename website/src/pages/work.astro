@@ -1,7 +1,5 @@
 ---
 import Layout from '~/layouts/Layout.astro';
-import ScrollReveal from '~/components/anim/ScrollReveal.astro';
-import InteractiveElement from '~/components/anim/InteractiveElement.astro';
 import fs from 'node:fs';
 import yaml from 'js-yaml';
 
@@ -165,192 +163,172 @@ const caseStudies: CaseStudy[] = featuredMappings.map((mapping) => {
     tech: mapping.tech,
   };
 });
+
+// Sub-section labels for the case-study detail pages
+const detailSubsections = [
+  { number: '01', label: 'Problem' },
+  { number: '02', label: 'Constraints' },
+  { number: '03', label: 'Solution' },
+  { number: '04', label: 'Outcome' },
+] as const;
 ---
 
 <Layout metadata={metadata}>
-  <!-- Header -->
-  <section class="relative py-20 px-4 sm:px-6 lg:px-8 border-b border-border/[0.06]">
-    <ScrollReveal direction="up" delay={0} duration={0.6}>
-      <div class="max-w-4xl mx-auto text-center">
-        <span
-          class="inline-block px-4 py-2 bg-primary/[0.08] text-primary text-xs font-heading font-semibold tracking-wider rounded-sm mb-6"
-        >
-          CASE STUDIES
-        </span>
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-text-heading mb-6">
-          Werner Bisschoff — Selected Work
-        </h1>
-        <p class="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed mb-6">
-          Selected projects spanning embedded systems, infrastructure engineering, and agentic AI workflows.
-        </p>
+  <!-- § 00 — Page Header -->
+  <section class="px-6 sm:px-8 lg:px-12 py-16 border-b border-hairline">
+    <div class="max-w-4xl mx-auto">
+      <div class="nb-section-marker">
+        <span class="marker">00</span>
+        <span class="rule"></span>
+        <span class="label">Page Header</span>
       </div>
-    </ScrollReveal>
+      <p class="mono-label text-amber mb-3">Case Studies</p>
+      <h1 class="mb-6">Selected Work</h1>
+      <p class="text-lg text-ink-muted leading-relaxed max-w-2xl">
+        Selected projects spanning embedded systems, infrastructure engineering, and agentic AI workflows.
+      </p>
+    </div>
   </section>
 
-  <!-- Case Studies Grid -->
-  <section class="relative py-16 px-4 sm:px-6 lg:px-8">
-    <ScrollReveal direction="up" delay={0.1} duration={0.6}>
-      <div class="max-w-7xl mx-auto">
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {
-            caseStudies.map((study, index) => (
-              <ScrollReveal direction="up" delay={0.15 + index * 0.1} duration={0.6}>
-                <a
-                  href={`#study-${study.id}`}
-                  class="group flex flex-col h-full p-6 bg-bg-element border border-border/[0.06] rounded-sm hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/[0.08]"
-                >
-                  <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-heading font-semibold text-primary uppercase tracking-wider">
-                      {study.category}
-                    </span>
-                  </div>
-
-                  <h2 class="text-lg font-heading font-semibold text-text-heading mb-3 group-hover:text-primary transition-colors break-words">
-                    {study.title}
-                  </h2>
-
-                  <p class="text-text-muted text-sm mb-4 line-clamp-3 leading-relaxed">{study.problem}</p>
-
-                  <div class="flex flex-wrap gap-2 mb-4">
-                    {study.tech.slice(0, 3).map((t) => (
-                      <span class="px-2 py-1 bg-bg-page text-xs text-text-muted/80 font-mono rounded">{t}</span>
-                    ))}
-                  </div>
-
-                  <div class="flex items-center text-primary text-sm font-semibold mt-auto group-hover:translate-x-1 transition-transform">
-                    View Case Study
-                    <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </div>
-                </a>
-              </ScrollReveal>
-            ))
-          }
-        </div>
+  <!-- § 01 — Case Study Index -->
+  <section id="case-studies" class="px-6 sm:px-8 lg:px-12 py-16 border-b border-hairline">
+    <div class="max-w-7xl mx-auto">
+      <div class="nb-section-marker">
+        <span class="marker">01</span>
+        <span class="rule"></span>
+        <span class="label">Index</span>
       </div>
-    </ScrollReveal>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {
+          caseStudies.map((study) => (
+            <a
+              href={`#study-${study.id}`}
+              class="group flex flex-col h-full p-6 bg-paper border border-hairline transition-colors duration-150 hover:border-hairline-strong"
+            >
+              <span class="font-mono text-xs text-amber uppercase tracking-wider mb-4">{study.category}</span>
+
+              <h2 class="text-lg font-semibold text-ink-heading mb-3 break-words transition-colors duration-150 group-hover:text-amber">
+                {study.title}
+              </h2>
+
+              <p class="text-ink-muted text-sm leading-relaxed line-clamp-3 mb-6">{study.problem}</p>
+
+              <div class="flex flex-wrap gap-2 mb-6">
+                {study.tech.slice(0, 3).map((t) => (
+                  <span class="font-mono text-xs text-ink-muted px-2 py-1 border border-hairline">{t}</span>
+                ))}
+              </div>
+
+              <span class="font-mono text-sm text-amber mt-auto">View Case Study →</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
   </section>
 
-  {/* Detailed Case Studies */}
+  <!-- § 02–08 — Detailed Case Studies -->
   {
-    caseStudies.map((study) => (
-      <section
-        id={`study-${study.id}`}
-        class="relative py-20 px-4 sm:px-6 lg:px-8 border-t border-border/[0.06] scroll-mt-20"
-      >
-        <ScrollReveal direction="up" delay={0.2} duration={0.6}>
+    caseStudies.map((study, index) => {
+      const sectionNumber = String(index + 2).padStart(2, '0');
+      return (
+        <section id={`study-${study.id}`} class="px-6 sm:px-8 lg:px-12 py-20 border-t border-hairline scroll-mt-20">
           <div class="max-w-4xl mx-auto">
-            {/* Study Header */}
-            <ScrollReveal direction="up" delay={0.25} duration={0.6}>
-              <div class="mb-12">
-                <span class="inline-block px-4 py-2 bg-primary/[0.08] text-primary text-xs font-heading font-semibold tracking-wider rounded-sm mb-6">
-                  {study.category}
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-heading font-bold text-text-heading mb-4">{study.title}</h2>
-                <div class="flex flex-wrap gap-2">
-                  {study.tech.map((t) => (
-                    <span class="px-3 py-1.5 bg-bg-element border border-border/[0.08] text-sm text-text-muted font-mono rounded">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
+            {/* Section header */}
+            <div class="nb-section-marker">
+              <span class="marker">{sectionNumber}</span>
+              <span class="rule" />
+              <span class="label">{study.category}</span>
+            </div>
 
-            {/* Problem */}
-            <ScrollReveal direction="up" delay={0.3} duration={0.6}>
-              <div class="mb-12">
-                <h3 class="text-2xl font-heading font-semibold text-text-heading mb-4 flex items-center">
-                  <span class="w-8 h-8 text-primary rounded-sm flex items-center justify-center mr-3 text-lg font-mono">
-                    !
-                  </span>
-                  Problem
-                </h3>
-                <p class="text-text-muted text-lg leading-relaxed pl-11">{study.problem}</p>
-              </div>
-            </ScrollReveal>
+            <h2 class="h1 mb-6">{study.title}</h2>
 
-            {/* Constraints */}
+            <div class="flex flex-wrap gap-2 mb-16">
+              {study.tech.map((t) => (
+                <span class="font-mono text-xs text-ink-muted px-2.5 py-1 border border-hairline">{t}</span>
+              ))}
+            </div>
+
+            {/* 01 Problem */}
+            <div class="mb-12">
+              <div class="nb-section-marker">
+                <span class="marker">{detailSubsections[0].number}</span>
+                <span class="rule" />
+                <span class="label">{detailSubsections[0].label}</span>
+              </div>
+              <h3 class="mb-4">{detailSubsections[0].label}</h3>
+              <p class="text-ink-muted text-lg leading-relaxed">{study.problem}</p>
+            </div>
+
+            {/* 02 Constraints */}
             {'constraints' in study && study.constraints && (
-              <ScrollReveal direction="up" delay={0.35} duration={0.6}>
-                <div class="mb-12">
-                  <h3 class="text-2xl font-heading font-semibold text-text-heading mb-4 flex items-center">
-                    <span class="w-8 h-8 text-primary rounded-sm flex items-center justify-center mr-3 text-lg font-mono">
-                      {'</>'}
-                    </span>
-                    Constraints
-                  </h3>
-                  <ul class="space-y-3 pl-11">
-                    {study.constraints.map((constraint) => (
-                      <li class="flex items-start text-text-muted text-lg leading-relaxed gap-3">
-                        <span class="text-primary shrink-0">•</span>
-                        <span>{constraint}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </ScrollReveal>
-            )}
-
-            {/* Solution */}
-            <ScrollReveal direction="up" delay={0.4} duration={0.6}>
               <div class="mb-12">
-                <h3 class="text-2xl font-heading font-semibold text-text-heading mb-4 flex items-center">
-                  <span class="w-8 h-8 text-primary rounded-sm flex items-center justify-center mr-3 text-lg font-mono">
-                    $
-                  </span>
-                  Solution
-                </h3>
-                <p class="text-text-muted text-lg leading-relaxed pl-11">{study.solution}</p>
-              </div>
-            </ScrollReveal>
-
-            {/* Outcome */}
-            {'outcome' in study && study.outcome && (
-              <ScrollReveal direction="up" delay={0.45} duration={0.6}>
-                <div>
-                  <h3 class="text-2xl font-heading font-semibold text-text-heading mb-4 flex items-center">
-                    <span class="w-8 h-8 text-primary rounded-sm flex items-center justify-center mr-3 text-lg font-mono">
-                      ✓
-                    </span>
-                    Outcome
-                  </h3>
-                  <ul class="space-y-3 pl-11">
-                    {study.outcome.map((result) => (
-                      <li class="flex items-start text-text-muted text-lg leading-relaxed gap-3">
-                        <span class="text-primary shrink-0">•</span>
-                        <span>{result}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div class="nb-section-marker">
+                  <span class="marker">{detailSubsections[1].number}</span>
+                  <span class="rule" />
+                  <span class="label">{detailSubsections[1].label}</span>
                 </div>
-              </ScrollReveal>
+                <h3 class="mb-4">{detailSubsections[1].label}</h3>
+                <ul class="space-y-3 list-none">
+                  {study.constraints.map((constraint) => (
+                    <li class="flex items-start text-ink-muted text-lg leading-relaxed gap-3">
+                      <span class="text-amber shrink-0 font-mono" aria-hidden="true">
+                        ▸
+                      </span>
+                      <span>{constraint}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
 
-            {/* Back to Top */}
-            <ScrollReveal direction="up" delay={0.5} duration={0.6}>
-              <div class="mt-12 pt-8 border-t border-border/[0.06]">
-                <InteractiveElement tag="a" href="#" hoverScale={1.05} activeScale={0.98}>
-                  <span class="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-semibold text-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
-                    Back to Case Studies
-                  </span>
-                </InteractiveElement>
+            {/* 03 Solution */}
+            <div class="mb-12">
+              <div class="nb-section-marker">
+                <span class="marker">{detailSubsections[2].number}</span>
+                <span class="rule" />
+                <span class="label">{detailSubsections[2].label}</span>
               </div>
-            </ScrollReveal>
+              <h3 class="mb-4">{detailSubsections[2].label}</h3>
+              <p class="text-ink-muted text-lg leading-relaxed">{study.solution}</p>
+            </div>
+
+            {/* 04 Outcome */}
+            {'outcome' in study && study.outcome && (
+              <div class="mb-12">
+                <div class="nb-section-marker">
+                  <span class="marker">{detailSubsections[3].number}</span>
+                  <span class="rule" />
+                  <span class="label">{detailSubsections[3].label}</span>
+                </div>
+                <h3 class="mb-4">{detailSubsections[3].label}</h3>
+                <ul class="space-y-3 list-none">
+                  {study.outcome.map((result) => (
+                    <li class="flex items-start text-ink-muted text-lg leading-relaxed gap-3">
+                      <span class="text-amber shrink-0 font-mono" aria-hidden="true">
+                        ▸
+                      </span>
+                      <span>{result}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Back to Case Studies */}
+            <div class="mt-16 pt-8 border-t border-hairline">
+              <a
+                href="#case-studies"
+                class="font-mono text-sm text-amber hover:text-ink-heading transition-colors duration-150 inline-flex items-center gap-2"
+              >
+                <span aria-hidden="true">↑</span>
+                Back to Case Studies
+              </a>
+            </div>
           </div>
-        </ScrollReveal>
-      </section>
-    ))
+        </section>
+      );
+    })
   }
 </Layout>
-
-<style>
-  /* Smooth scroll for anchor links */
-  html {
-    scroll-behavior: smooth;
-  }
-</style>

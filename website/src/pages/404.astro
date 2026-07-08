@@ -6,19 +6,28 @@ const title = `Error 404`;
 ---
 
 <Layout metadata={{ title }}>
-  <section class="flex items-center h-full p-16">
-    <div class="container flex flex-col items-center justify-center px-5 mx-auto my-8">
-      <div class="max-w-md text-center">
-        <h2 class="mb-8 font-bold text-9xl">
-          <span class="sr-only">Error</span>
-          <span class="text-primary">404</span>
-        </h2>
-        <p class="text-3xl font-semibold md:text-3xl">Sorry, we couldn't find this page.</p>
-        <p class="mt-4 mb-8 text-lg text-muted dark:text-slate-400">
-          But dont worry, you can find plenty of other things on our homepage.
-        </p>
-        <a rel="noopener noreferrer" href={getHomePermalink()} class="btn ml-4">Back to homepage</a>
+  <section class="py-16 px-4 sm:px-6 lg:px-8 border-b border-hairline">
+    <div class="max-w-4xl mx-auto">
+      <div class="nb-section-marker mb-6">
+        <span class="marker">01</span>
+        <span class="rule"></span>
+        <span class="label">not found</span>
       </div>
+      <h1 class="mb-6 text-left">404</h1>
+      <p class="text-lg text-ink-muted max-w-2xl leading-relaxed mb-3">
+        <span class="sr-only">Error</span>
+        This route returned no document.
+      </p>
+      <p class="text-lg text-ink-muted max-w-2xl leading-relaxed mb-8">
+        The URL may be malformed, or the resource may have moved.
+      </p>
+      <a
+        rel="noopener noreferrer"
+        href={getHomePermalink()}
+        class="inline-block border border-hairline px-5 py-2 font-mono text-sm font-medium text-ink hover:border-amber hover:text-amber transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-amber focus-visible:outline-offset-2"
+      >
+        Back to homepage
+      </a>
     </div>
   </section>
 </Layout>

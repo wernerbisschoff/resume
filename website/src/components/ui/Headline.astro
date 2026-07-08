@@ -6,6 +6,7 @@ const {
   title = await Astro.slots.render('title'),
   subtitle = await Astro.slots.render('subtitle'),
   tagline,
+  marker,
   classes = {},
 } = Astro.props;
 
@@ -17,19 +18,20 @@ const {
 ---
 
 {
-  (title || subtitle || tagline) && (
+  (title || subtitle || tagline || marker) && (
     <div class={twMerge('mb-8 md:mx-auto md:mb-12 text-center', containerClass)}>
+      {marker && (
+        <div class="nb-section-marker">
+          <span class="marker">{marker}</span>
+          <span class="rule" />
+        </div>
+      )}
       {tagline && (
-        <p class="text-base text-secondary dark:text-blue-200 font-bold tracking-wide uppercase" set:html={tagline} />
+        <p class="text-base text-ink-muted font-medium tracking-wide uppercase mono-label" set:html={tagline} />
       )}
-      {title && (
-        <h2
-          class={twMerge('font-bold leading-tighter tracking-tighter font-heading text-heading text-3xl', titleClass)}
-          set:html={title}
-        />
-      )}
+      {title && <h2 class={twMerge('text-ink-heading text-3xl', titleClass)} set:html={title} />}
 
-      {subtitle && <p class={twMerge('mt-4 text-muted', subtitleClass)} set:html={subtitle} />}
+      {subtitle && <p class={twMerge('mt-4 text-ink-muted', subtitleClass)} set:html={subtitle} />}
     </div>
   )
 }

@@ -107,6 +107,7 @@ export interface Headline {
   title?: string;
   subtitle?: string;
   tagline?: string;
+  marker?: string;
   classes?: Record<string, string>;
 }
 

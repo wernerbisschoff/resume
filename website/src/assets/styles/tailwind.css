@@ -2,245 +2,160 @@
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
 
-/* Refined Golden Theme (Default) - Complements portrait gold tones */
+/*
+ * Engineer's Notebook Theme
+ * ------------------------------------------------------------------
+ * Cream paper, dark warm ink, single amber accent. Reads like a
+ * printed technical reference — Stripe docs, O'Reilly, old spec sheet.
+ * Geist Pixel Circle reserved for h1 + section markers; Geist Mono
+ * Variable everywhere else with weight variation.
+ */
+
+/* Tailwind theme colors — exposed via @theme so Tailwind generates
+   text-amber / bg-paper / border-amber / etc. utility classes.
+   These reference the design tokens defined later in :root. */
+@theme {
+  --color-paper: var(--aw-paper);
+  --color-paper-raised: var(--aw-paper-raised);
+  --color-paper-edge: var(--aw-paper-edge);
+  --color-ink: var(--aw-ink);
+  --color-ink-heading: var(--aw-ink-heading);
+  --color-ink-muted: var(--aw-ink-muted);
+  --color-ink-faint: var(--aw-ink-faint);
+  --color-hairline: var(--aw-hairline);
+  --color-hairline-strong: var(--aw-hairline-strong);
+  --color-amber: var(--aw-accent-amber);
+  --color-amber-soft: var(--aw-accent-amber-soft);
+  --color-success: var(--aw-success);
+  --color-error: var(--aw-error);
+
+  /* Squared off — no rounded corners */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-full: 0;
+}
+
+/* Single light daisyui theme */
 @plugin "daisyui/theme" {
-  name: 'golden';
+  name: 'notebook';
   default: true;
-  prefersdark: true;
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Deep, sophisticated base colors */
-  --color-base-100: #0a0a0a;
-  --color-base-200: #111111;
-  --color-base-300: #1a1a1a;
-  --color-base-content: #e8e8e8;
+  /* Paper tones */
+  --color-base-100: #f4eee0;
+  --color-base-200: #ece4d0;
+  --color-base-300: #e0d6bd;
 
-  /* Refined gold palette - warm and luxurious */
-  --color-primary: #d4a84a;
-  --color-primary-content: #0a0a0a;
-  --color-secondary: #b8924a;
-  --color-secondary-content: #0a0a0a;
-  --color-accent: #e8c47a;
-  --color-accent-content: #0a0a0a;
-  --color-neutral: #0a0a0a;
-  --color-neutral-content: #e8e8e8;
-  --color-info: #d4a84a;
-  --color-info-content: #0a0a0a;
+  /* Ink */
+  --color-base-content: #2a2418;
 
-  /* Status colors */
-  --color-success: #4ade80;
-  --color-success-content: #0a0a0a;
-  --color-warning: #fbbf24;
-  --color-warning-content: #0a0a0a;
-  --color-error: #f87171;
-  --color-error-content: #0a0a0a;
+  /* Amber accent (printer's mark — not golden/luxurious) */
+  --color-primary: #9a521a;
+  --color-primary-content: #f4eee0;
+  --color-secondary: #8a4a16;
+  --color-secondary-content: #f4eee0;
+  --color-accent: #9a521a;
+  --color-accent-content: #f4eee0;
+  --color-neutral: #ece4d0;
+  --color-neutral-content: #15110a;
+  --color-info: #9a521a;
+  --color-info-content: #f4eee0;
 
-  /* Layout - refined rounding */
-  --radius-selector: 0.5rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.375rem;
+  /* Status colors — muted to fit paper aesthetic */
+  --color-success: #4a6e2a;
+  --color-success-content: #f4eee0;
+  --color-warning: #9a521a;
+  --color-warning-content: #f4eee0;
+  --color-error: #8a2a1a;
+  --color-error-content: #f4eee0;
 
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-
-  --border: 1px;
-  --depth: 1;
-  --noise: 0;
-}
-
-/* Teal Theme */
-@plugin "daisyui/theme" {
-  name: 'teal';
-  default: false;
-  prefersdark: true;
-  color-scheme: dark;
-
-  --color-base-100: #121212;
-  --color-base-200: #1a1a1a;
-  --color-base-300: #242424;
-  --color-base-content: #e0e0e0;
-  --color-primary: #599692;
-  --color-primary-content: #ffffff;
-  --color-secondary: #4a7d7a;
-  --color-secondary-content: #ffffff;
-  --color-accent: #599692;
-  --color-accent-content: #ffffff;
-  --color-neutral: #121212;
-  --color-neutral-content: #e0e0e0;
-  --color-info: #599692;
-  --color-info-content: #ffffff;
-  --color-success: #22c55e;
-  --color-success-content: #ffffff;
-  --color-warning: #eab308;
-  --color-warning-content: #121212;
-  --color-error: #ef4444;
-  --color-error-content: #ffffff;
-
-  --radius-selector: 1rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-
-  --border: 1px;
-
-  --depth: 1;
-  --noise: 0;
-}
-
-/* Steel & Gold Theme - High-End Industrial/Luxury */
-@plugin "daisyui/theme" {
-  name: 'steel';
-  default: false;
-  prefersdark: true;
-  color-scheme: dark;
-
-  /* Hue tokens */
-  --hue-slate: 305;
-  --hue-gold: 85;
-
-  /* Base/slate colors */
-  --color-base-100: oklch(22% 0.015 var(--hue-slate));
-  --color-base-200: oklch(26% 0.015 var(--hue-slate));
-  --color-base-300: oklch(30% 0.015 var(--hue-slate));
-  --color-base-content: oklch(78% 0.015 var(--hue-slate));
-
-  /* Gold accent colors */
-  --color-primary: oklch(78% 0.12 var(--hue-gold));
-  --color-primary-content: oklch(22% 0.015 var(--hue-slate));
-  --color-secondary: oklch(45% 0.08 var(--hue-gold));
-  --color-secondary-content: oklch(90% 0.02 var(--hue-slate));
-  --color-accent: oklch(78% 0.12 var(--hue-gold));
-  --color-accent-content: oklch(22% 0.015 var(--hue-slate));
-  --color-neutral: oklch(22% 0.015 var(--hue-slate));
-  --color-neutral-content: oklch(78% 0.015 var(--hue-slate));
-  --color-info: oklch(78% 0.12 var(--hue-gold));
-  --color-info-content: oklch(22% 0.015 var(--hue-slate));
-
-  /* Status colors */
-  --color-success: oklch(62% 0.15 145);
-  --color-success-content: oklch(98% 0.02 var(--hue-slate));
-  --color-warning: oklch(78% 0.12 var(--hue-gold));
-  --color-warning-content: oklch(22% 0.015 var(--hue-slate));
-  --color-error: oklch(60% 0.18 25);
-  --color-error-content: oklch(98% 0.02 var(--hue-slate));
-
-  /* Layout */
-  --radius-selector: 1rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
+  /* Layout — squared off */
+  --radius-selector: 0;
+  --radius-field: 0;
+  --radius-box: 0;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
   --border: 1px;
-  --depth: 1;
+  --depth: 0;
   --noise: 0;
-
-  /* Extended tokens */
-  --aw-color-text-default: oklch(78% 0.015 var(--hue-slate));
-  --aw-color-text-muted: oklch(68% 0.015 var(--hue-slate));
-  --aw-color-text-heading: oklch(90% 0.02 var(--hue-slate));
-  --aw-color-bg-page: oklch(22% 0.015 var(--hue-slate));
-  --aw-color-bg-element: oklch(26% 0.015 var(--hue-slate));
-  --aw-color-bg-hover: oklch(30% 0.015 var(--hue-slate));
-  --aw-color-border: oklch(35% 0.01 var(--hue-slate) / 20%);
-  --aw-color-border-hover: oklch(45% 0.01 var(--hue-slate) / 30%);
-  --aw-color-accent: oklch(78% 0.12 var(--hue-gold));
-  --aw-color-primary: oklch(78% 0.12 var(--hue-gold));
 }
 
-/* Extended Design Tokens per theme */
-@layer theme {
-  [data-theme='golden'] {
-    /* Refined text hierarchy */
-    --aw-color-text-default: #e8e8e8;
-    --aw-color-text-muted: rgb(232 232 232 / 70%);
-    --aw-color-text-heading: #fafafa;
-
-    /* Deep backgrounds */
-    --aw-color-bg-page: #0a0a0a;
-    --aw-color-bg-element: #111111;
-    --aw-color-bg-hover: #1a1a1a;
-
-    /* Subtle borders */
-    --aw-color-border: rgb(255 255 255 / 8%);
-    --aw-color-border-hover: rgb(255 255 255 / 15%);
-
-    /* Gold accents */
-    --aw-color-accent: #e8c47a;
-    --aw-color-primary: #d4a84a;
-    --aw-color-gold-glow: rgba(212, 168, 74, 0.15);
-  }
-
-  [data-theme='teal'] {
-    --aw-color-text-default: #e0e0e0;
-    --aw-color-text-muted: rgb(244 244 244 / 70%);
-    --aw-color-text-heading: #f4f4f4;
-    --aw-color-bg-page: #121212;
-    --aw-color-bg-element: #1a1a1a;
-    --aw-color-bg-hover: #242424;
-    --aw-color-border: rgb(255 255 255 / 10%);
-    --aw-color-border-hover: rgb(255 255 255 / 20%);
-    --aw-color-accent: #599692;
-    --aw-color-primary: #599692;
-  }
-}
-
-/* Global Design Tokens */
+/*
+ * Design tokens for the notebook theme.
+ * The --aw-color-* names are kept so existing utility classes
+ * (text-default, bg-page, border-border, …) keep resolving.
+ */
 :root {
-  /* Animation Design Tokens */
-  /* Durations */
+  /* Paper */
+  --aw-paper: #f4eee0;
+  --aw-paper-raised: #ece4d0;
+  --aw-paper-edge: #e0d6bd;
+
+  /* Ink */
+  --aw-ink: #2a2418;
+  --aw-ink-heading: #15110a;
+  --aw-ink-muted: #6e6553;
+  --aw-ink-faint: #94897a;
+
+  /* Hairlines */
+  --aw-hairline: #d8cdb2;
+  --aw-hairline-strong: #b8a884;
+
+  /* Accent */
+  --aw-accent-amber: #9a521a;
+  --aw-accent-amber-soft: rgba(154, 82, 26, 0.08);
+  --aw-accent-amber-faint: rgba(154, 82, 26, 0.04);
+
+  /* Status */
+  --aw-success: #4a6e2a;
+  --aw-error: #8a2a1a;
+
+  /* --aw-color-* aliases (existing utility classes) */
+  --aw-color-text-default: var(--aw-ink);
+  --aw-color-text-muted: var(--aw-ink-muted);
+  --aw-color-text-heading: var(--aw-ink-heading);
+  --aw-color-bg-page: var(--aw-paper);
+  --aw-color-bg-element: var(--aw-paper-raised);
+  --aw-color-bg-hover: var(--aw-paper-edge);
+  --aw-color-border: var(--aw-hairline);
+  --aw-color-border-hover: var(--aw-hairline-strong);
+  --aw-color-accent: var(--aw-accent-amber);
+  --aw-color-primary: var(--aw-accent-amber);
+
+  /* Animation tokens — restrained */
   --anim-duration-instant: 0.1s;
-  --anim-duration-fast: 0.2s;
-  --anim-duration-base: 0.5s;
-  --anim-duration-slow: 0.8s;
-  --anim-duration-slower: 1.2s;
-
-  /* Delays */
-  --anim-delay-none: 0s;
-  --anim-delay-short: 0.1s;
-  --anim-delay-base: 0.2s;
-  --anim-delay-long: 0.4s;
-
-  /* Easing Functions */
-  --anim-ease-linear: linear;
-  --anim-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --anim-duration-fast: 0.15s;
+  --anim-duration-base: 0.25s;
   --anim-ease-out: cubic-bezier(0, 0, 0.2, 1);
   --anim-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --anim-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --anim-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-  /* Brand Colors - Animation Primary */
-  --color-primary-teal: #599692;
-  --color-primary-teal-light: #7abeb9;
-  --color-primary-teal-dark: #4a7d7a;
-
-  /* Custom animation - fadeInUp */
-  --animate-fade-in-up: fade-in-up 1s both;
 }
 
-/* Text selection styling */
+/* Selection */
 ::selection {
-  background-color: var(--aw-color-primary, #c1974b);
-  color: #f4f4f4;
+  background-color: var(--aw-accent-amber);
+  color: var(--aw-paper);
 }
 
-/* Custom keyframes */
-@keyframes fade-in-up {
-  0% {
-    opacity: 0;
-    transform: translateY(2rem);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Subtle paper grain — barely-there texture, not noise */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.47 0 0 0 0 0.35 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 
 /* Custom variant - intersect (for scroll animations) */
 @variant intersect (&:not([no-intersect]));
 
-/* Custom utilities */
+/* Utility classes that bridge to the tokens */
 @layer utilities {
   /* Background colors */
   .bg-page {
@@ -290,73 +205,58 @@
   .border-border {
     border-color: var(--aw-color-border);
   }
+
+  /* Section marker — Geist Pixel Circle number with horizontal rule */
+  .nb-section-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .nb-section-marker > .marker {
+    font-family: 'Geist Pixel Circle', monospace;
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    color: var(--aw-accent-amber);
+    flex-shrink: 0;
+  }
+  .nb-section-marker > .rule {
+    flex: 1;
+    height: 1px;
+    background-color: var(--aw-hairline);
+    align-self: center;
+  }
+  .nb-section-marker > .label {
+    font-family: 'Geist Mono Variable', monospace;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--aw-ink-muted);
+    flex-shrink: 0;
+  }
 }
 
-/* Header styles */
-#header.scroll > div:first-child {
-  background-color: var(--aw-color-bg-page);
-  @apply md:bg-white/90 md:backdrop-blur-md;
-  box-shadow: 0 0.375rem 1.5rem 0 rgb(140 152 164 / 13%);
-}
-.dark #header.scroll > div:first-child,
-#header.scroll.dark > div:first-child {
-  background-color: var(--aw-color-bg-page);
-  @apply md:bg-[#030621e6] border-b border-gray-500/20;
-  box-shadow: none;
+/* Print-friendly base */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  body::before {
+    display: none;
+  }
 }
 
-/* Header expanded state */
-#header.expanded nav {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  bottom: 70px !important;
-  padding: 0 5px;
-}
-
-/* Dropdown menus */
-.dropdown:focus .dropdown-menu,
-.dropdown:focus-within .dropdown-menu,
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-/* Icon stroke widths */
-[astro-icon].icon-light > * {
-  stroke-width: 1.2;
-}
-
-[astro-icon].icon-bold > * {
-  stroke-width: 2.4;
-}
-
-/* Menu toggle animation */
-[data-aw-toggle-menu] path {
-  @apply transition;
-}
-[data-aw-toggle-menu].expanded g > path:first-child {
-  @apply -rotate-45 translate-y-[15px] translate-x-[-3px];
-}
-
-[data-aw-toggle-menu].expanded g > path:last-child {
-  @apply rotate-45 translate-y-[-8px] translate-x-[14px];
-}
-
-/* Typography utilities */
-.dd *:first-child {
-  margin-top: 0;
-}
-
-/* View Transitions */
+/* View transitions */
 @view-transition {
   navigation: auto;
 }
 
-/* Fade transition animation */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.3s;
+  animation-duration: 0.2s;
   animation-timing-function: ease-out;
 }
 
@@ -380,15 +280,12 @@
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-/* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) {

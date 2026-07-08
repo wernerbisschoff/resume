@@ -1,30 +1,28 @@
 ---
 /**
- * Footer Component
+ * Footer Component — Engineer's Notebook
  *
- * Simple footer with email contact and social links.
- * Clean, minimal design matching the technical aesthetic.
+ * Single-line footer with location, email, and social links.
+ * Hairline border, mono labels, no glow, no scale animation.
  */
 
 import { footerData } from '~/navigation';
 import { Icon } from 'astro-icon/components';
 ---
 
-<footer class="relative border-t border-border/[0.06] mt-auto">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<footer class="relative border-t border-hairline mt-auto bg-paper">
+  <div class="max-w-6xl mx-auto px-6 lg:px-8 py-6">
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <!-- Location & Email Contact -->
-      <div
-        class="flex flex-col md:flex-row items-center gap-4 md:gap-6 text-sm text-text-muted font-mono tracking-wide"
-      >
-        <span class="text-text-muted/70">Cape Town, South Africa</span>
-        <span class="hidden md:inline text-text-muted/20">|</span>
-        <a href={`mailto:${footerData.email}`} class="hover:text-primary transition-colors duration-200">
+      <!-- Location + email -->
+      <div class="flex flex-col md:flex-row items-center gap-3 md:gap-6 text-sm font-mono">
+        <span class="text-ink-muted">Cape Town, South Africa</span>
+        <span class="hidden md:inline text-ink-faint">·</span>
+        <a href={`mailto:${footerData.email}`} class="text-ink hover:text-amber">
           {footerData.email}
         </a>
       </div>
 
-      <!-- Social Links — rel="me" enables cross-platform identity verification -->
+      <!-- Social links -->
       <div class="flex items-center gap-5">
         {
           footerData.socialLinks.map((social) => (
@@ -33,18 +31,13 @@ import { Icon } from 'astro-icon/components';
               target="_blank"
               rel="me noopener noreferrer"
               aria-label={social.ariaLabel}
-              class="text-text-muted/70 hover:text-primary transition-colors duration-200 group"
+              class="text-ink-muted hover:text-amber"
             >
-              <Icon name={social.icon} class="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
+              <Icon name={social.icon} class="w-5 h-5" />
             </a>
           ))
         }
       </div>
     </div>
-
-    <!-- Copyright -->
-    <!-- <p class="mt-6 text-center text-xs text-text-muted">
-      {footerData.footNote}
-    </p> -->
   </div>
 </footer>

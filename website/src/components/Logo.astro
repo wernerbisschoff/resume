@@ -1,8 +1,22 @@
 ---
 import { SITE } from 'astrowind:config';
-import favIconSvg from '~/assets/favicons/favicon.svg';
+
+/**
+ * Wordmark — Geist Pixel Circle signature
+ *
+ * Renders "werner bisschoff" in lowercase Pixel Circle. The pixel
+ * font gives the site its identity moment in the header.
+ */
 ---
 
-<a href="/" class="self-center ml-2 rtl:ml-0 rtl:mr-2 flex items-center" aria-label={`${SITE?.name} Home`}>
-  <img src={favIconSvg.src} alt={SITE?.name} class="w-8 h-8 md:w-10 md:h-10" />
+<a href="/" class="flex items-center text-ink-heading hover:text-amber" aria-label={`${SITE?.name} Home`}>
+  <span class="font-pixel text-base md:text-lg leading-none tracking-wide">werner bisschoff</span>
 </a>
+
+<style>
+  .font-pixel {
+    font-family: 'Geist Pixel Circle', monospace;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+</style>

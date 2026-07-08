@@ -1,9 +1,6 @@
 ---
 import Layout from '~/layouts/Layout.astro';
-import ScrollReveal from '~/components/anim/ScrollReveal.astro';
-import InteractiveElement from '~/components/anim/InteractiveElement.astro';
-import Image from '~/components/common/Image.astro';
-import portraitImage from '~/assets/images/werner-bisschoff-software-engineer.webp';
+import portraitImage from '~/assets/images/pixel-profile.png';
 import { getKnowledgeGraph, getPersonSchema } from '~/utils/structured-data';
 
 const metadata = {
@@ -27,459 +24,252 @@ const personSchema = getPersonSchema();
   <script type="application/ld+json" set:html={JSON.stringify(knowledgeGraph)} />
   <!-- Person JSON-LD (standalone, @id-linked to the graph) -->
   <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
-  <!-- Hero Section -->
-  <section
-    class="relative min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8 pt-16 pb-16 border-b border-border/[0.06]"
-  >
-    <!-- Refined background with gold glow -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <!-- Primary gold glow - top right -->
-      <div
-        class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.08] rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4"
-      >
-      </div>
-      <!-- Secondary subtle glow - bottom left -->
-      <div
-        class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/[0.04] rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4"
-      >
-      </div>
-    </div>
 
+  <!-- § 00 — Hero -->
+  <section class="relative px-4 sm:px-6 lg:px-8 pt-20 pb-16 border-b border-hairline">
     <div class="relative max-w-6xl mx-auto w-full">
-      <!-- Grid Layout: 2 rows, 2 columns on desktop -->
-      <div class="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-y-12 gap-x-8 lg:items-center">
-        <!-- Top Left: Eyebrow name (H1) + Title (H2) + bio -->
-        <div class="text-center lg:text-left hero-entrance" style="--delay: 0ms">
-          <h1 class="text-sm sm:text-base font-mono uppercase tracking-[0.2em] text-primary mb-4 font-semibold">
-            Werner Bisschoff
-          </h1>
-          <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-text-heading leading-[1.1]">
+      <!-- Row 1: Text + image side by side at lg, stacked below -->
+      <div class="flex flex-col lg:flex-row lg:items-center gap-y-10 gap-x-8">
+        <div class="flex-1 min-w-0 text-center lg:text-left order-2 lg:order-none">
+          <p class="font-mono text-sm text-ink-muted mb-4">Werner Bisschoff</p>
+          <h1 class="text-ink-heading leading-[1.1] text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
             Embedded systems to full-stack infrastructure.
-            <span class="text-primary block mt-1">Spec-driven. Tested. Reliable.</span>
-          </h2>
-          <p class="mt-6 max-w-2xl mx-auto lg:mx-0 text-base sm:text-lg text-text-muted leading-relaxed">
+          </h1>
+          <p class="mt-3 font-mono text-ink-muted text-base sm:text-lg">Spec-driven. Tested. Reliable.</p>
+          <p class="mt-6 text-base sm:text-lg text-ink leading-relaxed">
             Werner Bisschoff is a software engineer in Cape Town specializing in
-            <span class="text-primary">embedded systems</span>,
-            <span class="text-primary">systems engineering</span>, and
-            <span class="text-primary">infrastructure engineering</span> — with
-            <span class="text-primary">test-driven development</span> and
-            <span class="text-primary">agentic AI workflows</span> as the default practice.
+            <span class="text-ink-heading font-semibold">embedded systems</span>,
+            <span class="text-ink-heading font-semibold">systems engineering</span>, and
+            <span class="text-ink-heading font-semibold">infrastructure engineering</span> — with
+            <span class="text-ink-heading font-semibold">test-driven development</span> and
+            <span class="text-ink-heading font-semibold">agentic AI workflows</span> as the default practice.
           </p>
         </div>
 
-        <!-- Top Right: Portrait (auto-positions to row 1, col 2) -->
-        <div class="relative flex justify-center lg:justify-end hero-entrance" style="--delay: 200ms">
-          <div class="relative group">
-            <!-- Multi-layer glow effect behind portrait -->
-            <div
-              class="absolute inset-0 bg-primary/25 rounded-full blur-[80px] scale-95 group-hover:scale-100 transition-transform duration-700"
-            >
-            </div>
-            <div class="absolute inset-0 bg-primary/15 rounded-full blur-[50px] scale-90"></div>
-            <!-- Portrait image -->
-            <!--
-              OPTIMIZED IMAGE LOADING
-              - Uses base64 placeholder for blur-up effect (LQIP)
-              - Responsive srcset: [320, 384, 512, 640, 768, 896]px
-              - Eager loading + fetchpriority="high" for LCP optimization
-              - WebP format conversion (automatic via build pipeline)
-
-              If portrait image changes, regenerate base64 placeholder:
-              1. sips -Z 20 src/assets/images/werner-bisschoff-software-engineer.jpeg --out src/assets/images/werner-bisschoff-software-engineer-tiny.jpeg
-              2. base64 -i src/assets/images/werner-bisschoff-software-engineer-tiny.jpeg
-              3. Add "data:image/jpeg;base64," prefix to output
-            -->
-            <Image
-              src={portraitImage}
-              alt="Werner Bisschoff — Software Engineer & Contractor, Cape Town"
-              background="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAADwAAAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/8IAEQgADwAUAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAMCBAEFAAYHCAkKC//EAMMQAAEDAwIEAwQGBAcGBAgGcwECAAMRBBIhBTETIhAGQVEyFGFxIweBIJFCFaFSM7EkYjAWwXLRQ5I0ggjhU0AlYxc18JNzolBEsoPxJlQ2ZJR0wmDShKMYcOInRTdls1V1pJXDhfLTRnaA40dWZrQJChkaKCkqODk6SElKV1hZWmdoaWp3eHl6hoeIiYqQlpeYmZqgpaanqKmqsLW2t7i5usDExcbHyMnK0NTV1tfY2drg5OXm5+jp6vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAQIAAwQFBgcICQoL/8QAwxEAAgIDAQMFBAQFAQEAAQcBCQAREhMUFRYXGBkaGxwfDREOHxIDBAUGBwgJCgsMDQ4P/2gAMAwEAAhEDEQAAAfgn27gftLm7fgQH0VW5D//aAAgBAQABBQKPjvmzW+2ORPXYWUU67Wz2bcdsu7Xw2qf/2gAIAQMRAT8BwYhKNeqeiP5v/9oACAECEQE/Aeoz+2N/oGPygIsQP+8f53//2gAIAQEABj8CdubVSloliQtWXkVdrFKx/jE2B+WjuU3cXNXYr5ZOoyHl/C1CO1ICdNFF/wD/xAAzEAEAAwACAgICAgMBAQAAAgsBEQAhMUFRYXGBkaGxwfDREOHxIDBAUGBwgJCgsMDQ4P/aAAgBAQABPyEkZynQg0BKoZ5DKQopAPzEh/di8w3AZTEaEPqoZDgePu//2gAMAwEAAhEDEQAAEAof/8QAMxEBAQEAAwABAgUFAQEAAQEJAQARITEQQVFhIHHwkYGhsdHB4fEwQFBgcICQoLDA0OD/2gAIAQMRAT8QdfMmfzHUT/X/ABf/2gAIAQIRAT8QfZ0Kn2OYtkvPxP/aAAgBAQABPxBoOCxPioZ6HbENgYh2KW8LFYLJKQAYZN6U+k59i2f0GAi5k/R15MKe+b//2Q=="
-              widths={[320, 384, 512, 640, 768, 896]}
-              width={384}
-              sizes="(max-width: 640px) 320px, 384px"
-              aspectRatio="1:1"
-              loading="eager"
-              decoding="async"
-              fetchpriority="high"
-              class="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 object-cover rounded-sm shadow-2xl shadow-primary/20 border border-primary/40 group-hover:border-primary/60 transition-colors duration-500"
-            />
-          </div>
-        </div>
-
-        <!-- Bottom: Badge, Tagline and CTAs -->
-        <div class="text-center lg:col-span-2 hero-entrance" style="--delay: 400ms">
-          <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
-            <!-- B.Eng. qualification badge -->
-            <div
-              class="inline-flex items-center gap-3 px-5 py-2.5 bg-primary/[0.08] border border-primary/[0.15] rounded-sm"
-            >
-              <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"></path>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                ></path>
-              </svg>
-              <span class="text-sm font-heading font-medium text-primary tracking-wide">
-                B.Eng. Computer and Electronic Engineering
-              </span>
-            </div>
-
-            <!-- Available for Contract badge -->
-            <div
-              class="inline-flex items-center gap-3 px-5 py-2.5 bg-accent/[0.1] border border-accent/[0.2] rounded-sm"
-            >
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-                ></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span class="text-sm font-heading font-medium text-green-400 tracking-wide">
-                Available for Contract
-              </span>
-            </div>
-          </div>
-
-          <!-- Location -->
-          <p class="text-xs text-text-muted/60 max-w-3xl mx-auto mb-4 font-heading tracking-wider uppercase">
-            Cape Town, South Africa
-          </p>
-
-          <!-- Tagline with systems/infrastructure focus -->
-          <p class="text-lg sm:text-xl text-text-muted max-w-3xl mx-auto mb-8 font-mono leading-relaxed tracking-wide">
-            <span class="text-primary">&gt;</span> Embedded Systems
-            <span class="text-text-muted/40 mx-2">|</span>
-            Infrastructure Engineering
-            <span class="text-text-muted/40 mx-2">|</span>
-            Spec-Driven Development
-          </p>
-
-          <!-- CTAs -->
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <InteractiveElement class="self-center" tag="a" href="/contact" hoverScale={1.03} activeScale={0.98}>
-              <span
-                class="group relative inline-flex items-center gap-2.5 px-7 py-3.5 bg-primary text-primary-content font-semibold text-base tracking-wide rounded-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 font-heading"
-              >
-                Get in Touch
-                <svg
-                  class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
-              </span>
-            </InteractiveElement>
-
-            <InteractiveElement class="self-center" tag="a" href="/work" hoverScale={1.02} activeScale={0.98}>
-              <span
-                class="inline-block px-7 py-3.5 border border-border hover:border-primary/60 text-text-default hover:text-primary font-semibold text-base tracking-wide rounded-sm transition-all duration-300 hover:bg-primary/5 font-heading"
-              >
-                View My Work
-              </span>
-            </InteractiveElement>
-          </div>
+        <!-- Pixel portrait: 20% larger than the original 169×171 source -->
+        <div class="flex justify-center lg:justify-start shrink-0">
+          <img
+            src={portraitImage.src}
+            width={203}
+            height={205}
+            alt="Werner Bisschoff — pixel portrait, Software Engineer"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+            class="pixel-art block w-[136px] h-[138px] sm:w-[169px] sm:h-[171px] md:w-[203px] md:h-[205px]"
+          />
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Engineering Discipline Section -->
-  <section class="relative py-24 px-4 sm:px-6 lg:px-8 bg-bg-element/50">
-    <ScrollReveal direction="up" delay={0.1} duration={0.6}>
-      <div class="max-w-4xl mx-auto">
-        <div class="text-center mb-16">
-          <span
-            class="inline-block px-4 py-2 bg-primary/10 text-primary text-sm font-heading font-semibold rounded-sm mb-6"
-          >
-            ENGINEERING METHODOLOGY
-          </span>
-          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-text-heading mb-6">
-            Spec-first. Tested. No surprises.
-          </h2>
-          <p class="text-lg text-text-muted max-w-2xl mx-auto">
-            I use spec-driven development to guide every tool in the stack — including AI-assisted workflows. Clear
-            requirements first, then the right tools for the job.
-          </p>
+      <!-- Row 2: Full-width mono labels + tagline + CTAs -->
+      <div class="mt-12 text-center">
+        <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mb-6 font-mono text-xs text-ink-muted">
+          <span>B.Eng. Computer and Electronic Engineering</span>
+          <span aria-hidden="true" class="text-ink-faint">·</span>
+          <span>Available for Contract</span>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-          <!-- Card 1 -->
-          <ScrollReveal direction="up" delay={0.15} duration={0.6}>
-            <div
-              class="group flex flex-col h-full p-6 bg-bg-page border border-border/10 rounded-sm hover:border-primary/50 transition-all duration-300"
-            >
-              <div
-                class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors"
-              >
-                <svg
-                  class="w-6 h-6 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-text-heading mb-2">Spec-Driven</h3>
-              <p class="text-text-muted">
-                Clear requirements before any code. Errors caught in specs cost fractions of what they cost in
-                implementation.
-              </p>
-            </div>
-          </ScrollReveal>
+        <p class="font-mono text-xs text-ink-faint mb-4">Cape Town, South Africa</p>
 
-          <!-- Card 2 -->
-          <ScrollReveal direction="up" delay={0.2} duration={0.6}>
-            <div
-              class="group flex flex-col h-full p-6 bg-bg-page border border-border/10 rounded-sm hover:border-primary/50 transition-all duration-300"
-            >
-              <div
-                class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors"
-              >
-                <svg
-                  class="w-6 h-6 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-text-heading mb-2">Full-Stack Reality</h3>
-              <p class="text-text-muted">
-                From C++ firmware on ESP32 to Python backends on AWS. I bridge low-level hardware and cloud
-                infrastructure in one delivery.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <!-- Card 3 -->
-          <ScrollReveal direction="up" delay={0.25} duration={0.6}>
-            <div
-              class="group flex flex-col h-full p-6 bg-bg-page border border-border/10 rounded-sm hover:border-primary/50 transition-all duration-300"
-            >
-              <div
-                class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors"
-              >
-                <svg
-                  class="w-6 h-6 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  ></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-text-heading mb-2">TDD-Verified</h3>
-              <p class="text-text-muted">
-                Test coverage catches edge cases before they reach production. Quality gates are automated, not
-                aspirational.
-              </p>
-            </div>
-          </ScrollReveal>
-        </div>
-      </div>
-    </ScrollReveal>
-  </section>
-
-  <!-- About / Positioning Section -->
-  <section class="relative py-24 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <!-- Who I Am -->
-      <div class="text-center mb-16">
-        <ScrollReveal direction="up" delay={0.2} duration={0.6}>
-          <h2 class="text-3xl sm:text-4xl font-bold text-text-heading mb-8 text-center">Software Engineer</h2>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.3} duration={0.6}>
-          <div class="prose prose-lg max-w-none mx-auto">
-            <p class="text-xl text-text-muted leading-relaxed mb-6">
-              I bridge the gap between hardware and cloud. From designing event-driven C++ firmware for embedded systems
-              to building ERPNext workflows with Python and SQL. Recent work includes cutting firmware bugs through
-              robust FSM architectures and bringing engineering rigour to every layer of the stack.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.4} duration={0.6}>
-          <div class="prose prose-lg max-w-none mx-auto">
-            <p class="text-text-muted text-lg leading-relaxed mb-6">
-              What sets my work apart is the ability to link low-level hardware (NFC, BLE, CAN bus) to high-level
-              applications, driven by a deep curiosity for how systems function from the metal up. I build
-              infrastructure that teams can rely on — tested, documented, and designed to handle the edge cases that
-              only experience catches.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.5} duration={0.6}>
-          <div class="prose prose-lg max-w-none mx-auto">
-            <p class="text-text-muted text-lg leading-relaxed">
-              Methodology: spec-first design, test-driven development, and continuous delivery built on infrastructure
-              as code. Every layer of the stack gets the same rigour — whether it's a PCB trace or a cloud deployment.
-            </p>
-          </div>
-        </ScrollReveal>
-      </div>
-
-      <!-- My Approach -->
-      <div class="grid sm:grid-cols-2 gap-6 text-left mb-16">
-        <ScrollReveal direction="up" delay={0.6} duration={0.6}>
-          <div class="p-6 border-l-2 border-primary bg-bg-element/30">
-            <h3 class="text-lg font-semibold text-text-heading mb-3">
-              <span class="text-primary font-mono">01.</span> Spec-First
-            </h3>
-            <p class="text-text-muted">
-              Clear specifications are the cheapest bug fix. I invest in requirements before implementation, catching
-              errors when they cost minutes instead of weeks.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.65} duration={0.6}>
-          <div class="p-6 border-l-2 border-primary bg-bg-element/30">
-            <h3 class="text-lg font-semibold text-text-heading mb-3">
-              <span class="text-primary font-mono">02.</span> Hardware to Cloud
-            </h3>
-            <p class="text-text-muted">
-              Embedded systems, backend services, and infrastructure engineering are not separate disciplines. I bring
-              the same systems thinking from the metal up.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.7} duration={0.6}>
-          <div class="p-6 border-l-2 border-primary bg-bg-element/30">
-            <h3 class="text-lg font-semibold text-text-heading mb-3">
-              <span class="text-primary font-mono">03.</span> Tested Rigour
-            </h3>
-            <p class="text-text-muted">
-              TDD, automated CI, and infrastructure as code. Quality isn't checked at the end — it's baked into every
-              step of the delivery pipeline.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.75} duration={0.6}>
-          <div class="p-6 border-l-2 border-primary bg-bg-element/30">
-            <h3 class="text-lg font-semibold text-text-heading mb-3">
-              <span class="text-primary font-mono">04.</span> Resilient by Design
-            </h3>
-            <p class="text-text-muted">
-              From FSMs that handle edge cases to tested workflows. Systems built to function when things get complex,
-              not just when they work.
-            </p>
-          </div>
-        </ScrollReveal>
-      </div>
-
-      <!-- Background -->
-      <ScrollReveal direction="up" delay={0.8} duration={0.6}>
-        <div class="max-w-3xl mx-auto">
-          <h3 class="text-2xl font-bold text-text-heading mb-6 text-center">Background</h3>
-          <div class="prose prose-lg max-w-none">
-            <p class="text-text-muted text-lg leading-relaxed mb-6">
-              B.Eng. Computer and Electronic Engineering from North-West University (2020). 5+ years bridging embedded
-              systems and full-stack development across industries. Automotive Ethernet at UMAN Technologies. Consumer
-              electronics firmware at Ingenics/ViVa. Enterprise ERPNext at FARO Africa.
-            </p>
-            <p class="text-text-muted text-lg leading-relaxed">
-              Currently building Divergent Tabletop, a neurodivergent-focused peer community. Applying systems thinking
-              to solve community management challenges through automated software solutions. Always refining my TDD
-              loops for more hands-free workflows while maintaining architectural control.
-            </p>
-          </div>
-        </div>
-      </ScrollReveal>
-    </div>
-  </section>
-
-  <!-- Final CTA Section -->
-  <section class="relative py-24 px-4 sm:px-6 lg:px-8 bg-bg-element/50">
-    <ScrollReveal direction="up" delay={0.3} duration={0.6}>
-      <div class="max-w-3xl mx-auto text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold text-text-heading mb-6">Ready to build something reliable?</h2>
-        <p class="text-xl text-text-muted mb-12">
-          Let's discuss how I can help strengthen your engineering foundations.
+        <p class="text-base sm:text-lg text-ink-muted max-w-3xl mx-auto mb-8 font-mono leading-relaxed">
+          <span class="text-amber">&gt;</span> Embedded Systems
+          <span class="text-ink-faint mx-2">|</span>
+          Infrastructure Engineering
+          <span class="text-ink-faint mx-2">|</span>
+          Spec-Driven Development
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="/contact"
-            class="px-8 py-4 bg-primary text-primary-content font-semibold rounded-sm hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105 font-heading"
+            class="inline-flex items-center px-7 py-3.5 bg-ink-heading text-paper font-semibold text-base transition-colors duration-150 hover:bg-amber"
           >
-            Start a Conversation
+            Get in Touch
           </a>
-
           <a
             href="/work"
-            class="px-8 py-4 border-2 border-border hover:border-primary text-text-default hover:text-primary font-semibold rounded-sm transition-all duration-300 font-heading"
+            class="inline-block px-7 py-3.5 border border-hairline text-ink font-semibold text-base transition-colors duration-150 hover:border-amber hover:text-amber"
           >
-            See Case Studies
+            View My Work
           </a>
         </div>
       </div>
-    </ScrollReveal>
+    </div>
+  </section>
+
+  <!-- § 01 — Engineering Methodology -->
+  <section class="relative px-4 sm:px-6 lg:px-8 py-24">
+    <div class="max-w-4xl mx-auto">
+      <div class="nb-section-marker">
+        <span class="marker">01</span>
+        <span class="rule"></span>
+        <span class="label">Engineering Methodology</span>
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl md:text-5xl text-ink-heading mb-6">Spec-first. Tested. No surprises.</h2>
+      <p class="text-lg text-ink-muted max-w-2xl mb-12 leading-relaxed">
+        I use spec-driven development to guide every tool in the stack — including AI-assisted workflows. Clear
+        requirements first, then the right tools for the job.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <article class="p-6 bg-paper border border-hairline">
+          <p class="font-mono text-sm text-amber mb-3">I.</p>
+          <h3 class="text-xl font-semibold text-ink-heading mb-2">Spec-Driven</h3>
+          <p class="text-ink-muted">
+            Clear requirements before any code. Errors caught in specs cost fractions of what they cost in
+            implementation.
+          </p>
+        </article>
+
+        <article class="p-6 bg-paper border border-hairline">
+          <p class="font-mono text-sm text-amber mb-3">II.</p>
+          <h3 class="text-xl font-semibold text-ink-heading mb-2">Full-Stack Reality</h3>
+          <p class="text-ink-muted">
+            From C++ firmware on ESP32 to Python backends on AWS. I bridge low-level hardware and cloud infrastructure
+            in one delivery.
+          </p>
+        </article>
+
+        <article class="p-6 bg-paper border border-hairline">
+          <p class="font-mono text-sm text-amber mb-3">III.</p>
+          <h3 class="text-xl font-semibold text-ink-heading mb-2">TDD-Verified</h3>
+          <p class="text-ink-muted">
+            Test coverage catches edge cases before they reach production. Quality gates are automated, not
+            aspirational.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- § 02 — About / Positioning -->
+  <section class="relative px-4 sm:px-6 lg:px-8 py-24 border-t border-hairline">
+    <div class="max-w-4xl mx-auto">
+      <div class="nb-section-marker">
+        <span class="marker">02</span>
+        <span class="rule"></span>
+        <span class="label">About</span>
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl text-ink-heading mb-8">Software Engineer</h2>
+
+      <div class="max-w-3xl space-y-6 mb-16">
+        <p class="text-xl text-ink-muted leading-relaxed">
+          I bridge the gap between hardware and cloud. From designing event-driven C++ firmware for embedded systems to
+          building ERPNext workflows with Python and SQL. Recent work includes cutting firmware bugs through robust FSM
+          architectures and bringing engineering rigour to every layer of the stack.
+        </p>
+        <p class="text-ink-muted text-lg leading-relaxed">
+          What sets my work apart is the ability to link low-level hardware (NFC, BLE, CAN bus) to high-level
+          applications, driven by a deep curiosity for how systems function from the metal up. I build infrastructure
+          that teams can rely on — tested, documented, and designed to handle the edge cases that only experience
+          catches.
+        </p>
+        <p class="text-ink-muted text-lg leading-relaxed">
+          Methodology: spec-first design, test-driven development, and continuous delivery built on infrastructure as
+          code. Every layer of the stack gets the same rigour — whether it's a PCB trace or a cloud deployment.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-6 mb-16">
+        <article class="p-6 border-l-2 border-l-amber bg-paper-raised">
+          <h3 class="text-lg font-semibold text-ink-heading mb-3">
+            <span class="pixel-marker">01.</span> Spec-First
+          </h3>
+          <p class="text-ink-muted">
+            Clear specifications are the cheapest bug fix. I invest in requirements before implementation, catching
+            errors when they cost minutes instead of weeks.
+          </p>
+        </article>
+
+        <article class="p-6 border-l-2 border-l-amber bg-paper-raised">
+          <h3 class="text-lg font-semibold text-ink-heading mb-3">
+            <span class="pixel-marker">02.</span> Hardware to Cloud
+          </h3>
+          <p class="text-ink-muted">
+            Embedded systems, backend services, and infrastructure engineering are not separate disciplines. I bring the
+            same systems thinking from the metal up.
+          </p>
+        </article>
+
+        <article class="p-6 border-l-2 border-l-amber bg-paper-raised">
+          <h3 class="text-lg font-semibold text-ink-heading mb-3">
+            <span class="pixel-marker">03.</span> Tested Rigour
+          </h3>
+          <p class="text-ink-muted">
+            TDD, automated CI, and infrastructure as code. Quality isn't checked at the end — it's baked into every step
+            of the delivery pipeline.
+          </p>
+        </article>
+
+        <article class="p-6 border-l-2 border-l-amber bg-paper-raised">
+          <h3 class="text-lg font-semibold text-ink-heading mb-3">
+            <span class="pixel-marker">04.</span> Resilient by Design
+          </h3>
+          <p class="text-ink-muted">
+            From FSMs that handle edge cases to tested workflows. Systems built to function when things get complex, not
+            just when they work.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- § 03 — Background -->
+  <section class="relative px-4 sm:px-6 lg:px-8 py-24 border-t border-hairline">
+    <div class="max-w-3xl mx-auto">
+      <div class="nb-section-marker">
+        <span class="marker">03</span>
+        <span class="rule"></span>
+        <span class="label">Background</span>
+      </div>
+
+      <h3 class="text-2xl text-ink-heading mb-6">Background</h3>
+      <div class="space-y-6">
+        <p class="text-ink-muted text-lg leading-relaxed">
+          B.Eng. Computer and Electronic Engineering from North-West University (2020). 5+ years bridging embedded
+          systems and full-stack development across industries. Automotive Ethernet at UMAN Technologies. Consumer
+          electronics firmware at Ingenics/ViVa. Enterprise ERPNext at FARO Africa.
+        </p>
+        <p class="text-ink-muted text-lg leading-relaxed">
+          Currently building Divergent Tabletop, a neurodivergent-focused peer community. Applying systems thinking to
+          solve community management challenges through automated software solutions. Always refining my TDD loops for
+          more hands-free workflows while maintaining architectural control.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- § 04 — Final CTA -->
+  <section class="relative px-4 sm:px-6 lg:px-8 py-24 border-t border-hairline">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="nb-section-marker justify-center">
+        <span class="marker">04</span>
+        <span class="rule"></span>
+        <span class="label">Engage</span>
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl text-ink-heading mb-6">Ready to build something reliable?</h2>
+      <p class="text-xl text-ink-muted mb-12 leading-relaxed">
+        Let's discuss how I can help strengthen your engineering foundations.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/contact"
+          class="inline-flex items-center px-8 py-4 bg-ink-heading text-paper font-semibold text-lg transition-colors duration-150 hover:bg-amber"
+        >
+          Start a Conversation
+        </a>
+
+        <a
+          href="/work"
+          class="inline-block px-8 py-4 border border-hairline text-ink font-semibold text-lg transition-colors duration-150 hover:border-amber hover:text-amber"
+        >
+          See Case Studies
+        </a>
+      </div>
+    </div>
   </section>
 </Layout>
-<style>
-  /* Smooth scroll behavior */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Hero entrance animations */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeInRight {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  .hero-entrance {
-    opacity: 0;
-    animation: fadeInUp 0.6s ease-out forwards;
-    animation-delay: var(--delay, 0ms);
-  }
-
-  .hero-entrance:nth-child(2) {
-    animation-name: fadeInRight;
-  }
-
-  /* Respect prefers-reduced-motion */
-  @media (prefers-reduced-motion: reduce) {
-    .hero-entrance {
-      opacity: 1;
-      animation: none;
-    }
-  }
-</style>

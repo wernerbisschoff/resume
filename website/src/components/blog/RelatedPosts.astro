@@ -16,20 +16,23 @@ const relatedPosts = post.tags ? await getRelatedPosts(post, 4) : [];
 
 {
   APP_BLOG.isRelatedPostsEnabled && relatedPosts.length > 0 ? (
-    <section class="intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
+    <section>
       <div class="pt-8 lg:pt-12 md:pt-8 max-w-3xl mx-auto">
-        <h2 class="text-2xl font-bold text-text-heading mb-6">Related Posts</h2>
+        <div class="nb-section-marker">
+          <span class="marker">02</span>
+          <span class="rule" />
+          <span class="label">Related Notes</span>
+        </div>
+        <h2 class="text-ink-heading mb-6">Related Posts</h2>
         <div class="space-y-6">
           {relatedPosts.map((post) => (
             <a href={post.permalink} class="block group">
-              <h3 class="text-xl font-semibold text-text-heading group-hover:text-primary transition-colors">
-                {post.title}
-              </h3>
+              <h3 class="text-xl text-ink-heading group-hover:text-amber transition-colors">{post.title}</h3>
             </a>
           ))}
         </div>
-        <a href={getBlogPermalink()} class="inline-block mt-6 text-primary hover:underline">
-          View All Posts →
+        <a href={getBlogPermalink()} class="inline-block mt-6 text-amber font-mono">
+          View All Notes &rarr;
         </a>
       </div>
     </section>

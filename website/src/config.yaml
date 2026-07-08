@@ -73,4 +73,4 @@ analytics:
       partytown: false # GA4 loaded directly (better Lighthouse score)
 
 ui:
-  theme: 'dark:only' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"
+  theme: 'light:only' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

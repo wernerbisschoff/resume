@@ -24,7 +24,7 @@ const { language, textDirection } = I18N;
 ---
 
 <!doctype html>
-<html lang={language} dir={textDirection} data-theme="golden" class="2xl:text-[20px]">
+<html lang={language} dir={textDirection} data-theme="notebook" class="text-base">
   <head>
     <CommonMeta />
     <Favicons />
@@ -34,9 +34,9 @@ const { language, textDirection } = I18N;
     <Analytics />
   </head>
 
-  <body class="antialiased text-default bg-page tracking-tight flex flex-col min-h-screen">
+  <body class="antialiased text-default bg-page flex flex-col min-h-screen relative">
     <Header />
-    <main class="flex-grow" transition:animate="fade">
+    <main class="flex-grow relative z-10" transition:animate="fade">
       <slot />
     </main>
     <Footer />

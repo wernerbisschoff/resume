@@ -1,12 +1,12 @@
 ---
 /**
- * InteractiveElement - Micro-interaction Component
+ * InteractiveElement — Engineer's Notebook
  *
- * Provides hover, tap, and focus animations for interactive elements.
- * Subtle, professional animations matching "engineering ingenuity" aesthetic.
+ * Wraps an interactive element. With hoverScale=1 / activeScale=1 (the
+ * defaults), the JS animation calls are no-ops and CSS handles the hover
+ * feedback via color/border changes — engineering tools don't bounce.
  *
- * PRD Reference: FR-009, FR-010, FR-011
- * Task Reference: TM-015
+ * Pass scale values > 1 only when you genuinely need a scale animation.
  */
 
 export interface Props {
@@ -23,8 +23,8 @@ export interface Props {
 const {
   hover = true,
   active = true,
-  hoverScale = 1.02,
-  activeScale = 0.98,
+  hoverScale = 1,
+  activeScale = 1,
   class: className = '',
   tag = 'div',
   href,
@@ -33,7 +33,6 @@ const {
 
 const Tag = tag;
 const attrs = href ? { href } : type === 'button' ? { type } : {};
-// Type assertion: attrs are guaranteed to match Tag by construction
 const safeAttrs = attrs as Record<string, string | undefined>;
 ---
 
@@ -57,10 +56,13 @@ const safeAttrs = attrs as Record<string, string | undefined>;
 
     const hoverEnabled = element.dataset.hover === 'true';
     const activeEnabled = element.dataset.active === 'true';
-    const hScale = parseFloat(element.dataset.hoverScale || '1.02');
-    const aScale = parseFloat(element.dataset.activeScale || '0.98');
-    const duration = 200;
-    const easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+    const hScale = parseFloat(element.dataset.hoverScale || '1');
+    const aScale = parseFloat(element.dataset.activeScale || '1');
+    const duration = 150;
+    const easing = 'ease-out';
+
+    // Skip wiring entirely when scales are 1 — CSS handles feedback.
+    if (hScale === 1 && aScale === 1) return;
 
     if (hoverEnabled) {
       element.addEventListener('mouseenter', () => {
@@ -78,7 +80,7 @@ const safeAttrs = attrs as Record<string, string | undefined>;
       element.addEventListener('mousedown', () => {
         element.animate(
           { transform: [`scale(${hScale || 1})`, `scale(${aScale})`] },
-          { duration: duration / 2, easing: 'ease-out', fill: 'forwards' }
+          { duration: duration / 2, easing, fill: 'forwards' }
         );
       });
       element.addEventListener('mouseup', () => {
@@ -90,20 +92,3 @@ const safeAttrs = attrs as Record<string, string | undefined>;
     }
   });
 </script>
-
-<style>
-  .interactive-element {
-    display: inline-block;
-    cursor: pointer;
-    transition: outline-color 0.2s ease;
-  }
-  .interactive-element:focus-visible {
-    outline: 2px solid var(--color-primary-teal, #599692);
-    outline-offset: 2px;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .interactive-element {
-      /* No animations when motion is reduced */
-    }
-  }
-</style>

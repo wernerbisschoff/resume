@@ -14,10 +14,12 @@ const {
 } = Astro.props;
 
 const variants = {
-  primary: 'btn btn-primary rounded-full',
-  secondary: 'btn btn-secondary rounded-full',
-  tertiary: 'btn btn-ghost rounded-full',
-  link: 'link link-hover cursor-pointer',
+  primary:
+    'bg-ink-heading text-paper hover:bg-amber px-5 py-2.5 font-mono font-medium text-sm border border-hairline-strong',
+  secondary:
+    'border border-hairline text-ink hover:border-amber hover:text-amber px-5 py-2.5 font-mono font-medium text-sm',
+  tertiary: 'text-ink-muted hover:text-amber px-5 py-2.5 font-mono font-medium text-sm',
+  link: 'text-amber hover:underline font-mono font-medium text-sm',
 };
 ---
 
