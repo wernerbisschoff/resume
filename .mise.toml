@@ -146,3 +146,24 @@ depends = ["check", "website-check"]
 [tasks.build-all]
 description = "Build both CV PDFs and website for production"
 depends = ["build", "website-build"]
+
+[tasks.publish]
+description = "Build, create a git tag with today's date, and push it"
+depends = ["build"]
+run = """
+TODAY=$(date +%Y.%m.%d)
+if git rev-parse -q --verify "refs/tags/$TODAY" > /dev/null 2>&1; then
+    SUFFIX=1
+    while git rev-parse -q --verify "refs/tags/$TODAY.$SUFFIX" > /dev/null 2>&1; do
+        SUFFIX=$((SUFFIX + 1))
+    done
+    TAG="$TODAY.$SUFFIX"
+else
+    TAG="$TODAY"
+fi
+echo "Creating tag: $TAG"
+git tag "$TAG"
+echo "Pushing tag: $TAG"
+git push origin "$TAG"
+echo "Published $TAG"
+"""
