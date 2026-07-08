@@ -78,7 +78,6 @@
   items:
     - "ERPNext/Frappe Framework"
     - "Elixir/OTP"
-    - "Asynchronous Workflow Engines (Inngest, Oban)"
   variant: "infrastructure"
 
 - category: "Data Layer Infrastructure"

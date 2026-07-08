@@ -8,21 +8,21 @@
 #let default-location-color = rgb("#333333")
 
 // const icons (text labels for ATS compatibility)
-#let linkedin-icon = box(text("linkedin:"))
-#let github-icon = box(text("github:"))
-#let gitlab-icon = box(text("gitlab/"))
-#let bitbucket-icon = box(text("bitbucket/"))
-#let twitter-icon = box(text("twitter/"))
-#let bluesky-icon = box(text("bluesky/"))
-#let mastodon-icon = box(text("mastodon/"))
-#let google-scholar-icon = box(text("scholar/"))
-#let orcid-icon = box(text("orcid/"))
-#let phone-icon = box(text("tel:"))
-#let email-icon = box(text("email:"))
-#let birth-icon = box(text(""))
-#let homepage-icon = box(text("home:"))
-#let website-icon = box(text("web:"))
-#let address-icon = box(text("loc:"))
+#let linkedin-icon = box(text(weight: "bold", "linkedin:"))
+#let github-icon = box(text(weight: "bold", "github:"))
+#let gitlab-icon = box(text(weight: "bold", "gitlab/"))
+#let bitbucket-icon = box(text(weight: "bold", "bitbucket/"))
+#let twitter-icon = box(text(weight: "bold", "twitter/"))
+#let bluesky-icon = box(text(weight: "bold", "bluesky/"))
+#let mastodon-icon = box(text(weight: "bold", "mastodon/"))
+#let google-scholar-icon = box(text(weight: "bold", "scholar/"))
+#let orcid-icon = box(text(weight: "bold", "orcid/"))
+#let phone-icon = box(text(weight: "bold", "tel:"))
+#let email-icon = box(text(weight: "bold", "email:"))
+#let birth-icon = box(text(weight: "bold", ""))
+#let homepage-icon = box(text(weight: "bold", "home:"))
+#let website-icon = box(text(weight: "bold", "web:"))
+#let address-icon = box(text(weight: "bold", "loc:"))
 
 
 /// Helpers
@@ -385,8 +385,8 @@
   colored-headers: true,
   show-footer: true,
   language: "en",
-  font: ("Source Sans 3"),
-  header-font: "Roboto",
+  font: ("Geist",),
+  header-font: "Geist Pixel Circle",
   paper-size: "a4",
   use-smallcaps: true,
   show-address-icon: false,
@@ -455,7 +455,7 @@
   set heading(numbering: none, outlined: false)
 
   show heading.where(level: 1): it => block(sticky: true)[
-    #set text(size: 16pt, weight: "regular")
+    #set text(size: 13pt, weight: "regular", font: ("Geist Mono",))
     #set align(left)
     #set block(above: 1em)
     #let color = if colored-headers {
@@ -468,12 +468,12 @@
   ]
 
   show heading.where(level: 2): it => {
-    set text(color-darkgray, size: 12pt, style: "normal", weight: "bold")
+    set text(color-darkgray, size: 11pt, style: "normal", weight: "bold", font: ("Geist Mono",))
     it.body
   }
 
   show heading.where(level: 3): it => {
-    set text(size: 10pt, weight: "regular")
+    set text(size: 10pt, weight: "regular", font: ("Geist Mono",))
     __apply_smallcaps(it.body, use-smallcaps)
   }
 
@@ -481,7 +481,7 @@
     align(center)[
       #pad(bottom: 5pt)[
         #block[
-          #set text(size: 32pt, style: "normal", font: header-font)
+          #set text(size: 24pt, style: "normal", font: header-font)
           #if language == "zh" or language == "ja" [
             #text(accent-color, weight: "bold")[#author.lastname]#text(
               weight: "thin",
@@ -510,32 +510,61 @@
     ]
   }
 
-  let address = {
-    set text(size: 9pt, weight: "regular")
-    align(center)[
-      #if ("address" in author) [
-        #if show-address-icon [
-          #__contact_item(
-            (
-              icon: address-icon,
-              text: text(author.address),
-            ),
-            inset: contact-items-inset,
-          )
-        ] else [
-          #text(author.address)
-        ]
-      ]
-    ]
-  }
-
-  // Contact section
+  // Contact section — two lines: (loc, tel, email) / (website, linkedin, github)
   let contacts = {
     set box(height: 9pt)
     set text(size: 9pt, weight: "regular", style: "normal")
 
-    let items = __format_contact_items(author, item-inset: contact-items-inset)
-    align(center, items.join(contact-items-separator))
+    let sep = contact-items-separator
+
+    // Line 1: location, phone, email
+    let line1 = ()
+    if "address" in author {
+      line1.push(__contact_item(
+        (icon: address-icon, text: text(author.address)),
+        inset: contact-items-inset,
+      ))
+    }
+    if "phone" in author {
+      line1.push(__contact_item(
+        (text: author.phone, icon: phone-icon, link: author.phone),
+        link-prefix: "tel:",
+        inset: contact-items-inset,
+      ))
+    }
+    if "email" in author {
+      line1.push(__contact_item(
+        (text: author.email, icon: email-icon, link: author.email),
+        link-prefix: "mailto:",
+        inset: contact-items-inset,
+      ))
+    }
+
+    // Line 2: website, linkedin, github
+    let line2 = ()
+    if "website" in author {
+      line2.push(__contact_item(
+        (text: author.website, icon: website-icon, link: author.website),
+        inset: contact-items-inset,
+      ))
+    }
+    if "linkedin" in author {
+      line2.push(__contact_item(
+        (text: "linkedin.com/in/" + author.linkedin, icon: linkedin-icon, link: author.linkedin),
+        link-prefix: "https://www.linkedin.com/in/",
+        inset: contact-items-inset,
+      ))
+    }
+    if "github" in author {
+      line2.push(__contact_item(
+        (text: author.github, icon: github-icon, link: author.github),
+        link-prefix: "https://github.com/",
+        inset: contact-items-inset,
+      ))
+    }
+
+    [#align(center)[#line1.join(sep)]
+      #align(center)[#line2.join(sep)]]
   }
 
   if profile-picture != none {
@@ -546,7 +575,6 @@
       [
         #name
         #positions
-        #address
         #contacts
       ],
       align(left + horizon)[
@@ -563,7 +591,6 @@
   } else {
     name
     positions
-    address
     contacts
   }
 
@@ -635,14 +662,14 @@
 /// Styling for resume skill categories.
 /// - category (string): The category
 #let resume-skill-category(category) = {
-  set text(size: 11pt, style: "normal", weight: "bold", hyphenate: false)
+  set text(size: 10pt, style: "normal", weight: "bold", hyphenate: false)
   category
 }
 
 /// Styling for resume skill values/items
 /// - values (array): The skills to display
 #let resume-skill-values(values) = {
-  set text(size: 11pt, style: "normal")
+  set text(size: 10pt, style: "normal")
   // This is a list so join by comma (,)
   values.join(", ")
 }
@@ -748,8 +775,8 @@
   date: datetime.today().display("[month repr:long] [day], [year]"),
   accent-color: default-accent-color,
   language: "en",
-  font: ("Source Sans 3"),
-  header-font: "Roboto",
+  font: ("Geist",),
+  header-font: "Geist Pixel Circle",
   show-footer: true,
   signature: none,
   closing: none,
@@ -838,7 +865,7 @@
   set heading(numbering: none, outlined: false)
 
   show heading: it => block(..heading-padding)[
-    #set text(size: 16pt, weight: "regular")
+    #set text(size: 13pt, weight: "regular", font: ("Geist Mono",))
 
     #align(left)[
       #text[#strong[#text(accent-color)[#it.body]]]
@@ -850,7 +877,7 @@
     align(right)[
       #pad(bottom: 5pt)[
         #block[
-          #set text(size: 32pt, style: "normal", font: header-font)
+          #set text(size: 24pt, style: "normal", font: header-font)
           #if language == "zh" or language == "ja" [
             #text(accent-color, weight: "bold")[#author.lastname]#text(
               weight: "bold",

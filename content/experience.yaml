@@ -113,7 +113,7 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Refactored and extended ERPNext via Python and JavaScript server hooks, optimizing pricing matrices and BI reporting."
+    - text: "Refactored and extended ERPNext via Python and JavaScript server hooks."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
@@ -183,7 +183,7 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Designed data handling pipelines ensuring data transfer consistency across runtime platforms using declarative specifications."
+    - text: "Designed data handling pipelines ensuring consistency across platforms using declarative specifications."
       variant: "infrastructure"
       cv_priority: 1
       website_show: true
