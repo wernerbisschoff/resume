@@ -106,9 +106,8 @@ cover_letter:
       - >
         Recently, as Principal Systems Architect for the open-source Divergent Tabletop ecosystem,
         I engineered a high-concurrency real-time wiki engine using Elixir with the y_ex CRDT
-        library. By implementing a dynamic supervision tree and an actor-based memory buffering
-        architecture, I achieved 99.9% fault isolation and reduced per-session memory overhead
-        by 60%.
+        library. The dynamic supervision tree isolates per-page editing sessions, and process
+        hibernation keeps per-session memory overhead bounded.
     infrastructure:
       - >
         My recent work highlights my ability to transform complex real-world operational challenges
@@ -116,8 +115,8 @@ cover_letter:
         Divergent Tabletop documentation engine, I designed and deployed a single-database
         multi-tenant architecture utilizing PostgreSQL Row-Level Security (RLS) and
         transaction-scoped context injection. This strategy, combined with an in-memory
-        transactional flushing architecture, safely reduced database write volumes by 85% under
-        heavy user concurrency. Additionally, my background at FARO Africa includes leading the
+        transactional flushing architecture, keeps database write volume bounded under heavy
+        user concurrency. Additionally, my background at FARO Africa includes leading the
         migration of business workflows from Retool into custom Expo mobile environments,
         significantly lowering operational latency and eliminating third-party licensing dependencies.
 

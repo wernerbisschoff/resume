@@ -3,7 +3,7 @@
   company: "Divergent Tabletop"
   location: "Cape Town"
   role:
-    general: "Founder & Technical Lead"
+    general: "Founder and Host"
     systems: "Principal Systems Architect"
     infrastructure: "Principal Systems Architect"
   start_date: "Jul 2025"
@@ -23,7 +23,7 @@
       cv_priority: 1
       website_show: true
       star_ref: null
-    - text: "Engineered a distributed real-time data engine using Elixir/OTP and CRDTs. Deployed in-memory GenServer buffers with threshold-based flush, reducing database writes by ~85% under sustained load."
+    - text: "Engineered a distributed real-time data engine using Elixir/OTP and CRDTs. Deployed in-memory GenServer buffers with threshold-based flush to limit direct database write transactions under sustained edit load."
       variant: "shared"
       cv_priority: 1
       website_show: true
@@ -84,12 +84,12 @@
       website_show: true
       star_ref: null
     - text: "Provisioned AWS infrastructure with Pulumi; deployed Inngest and PayloadCMS services."
-      variant: "infrastructure"
+      variant: "general"
       cv_priority: 1
       website_show: true
       star_ref: null
     - text: "Introduced LLM-assisted development workflows → improved debugging speed and code review throughput, enabling faster iteration."
-      variant: "general"
+      variant: "systems"
       cv_priority: 1
       website_show: true
       star_ref: null
@@ -119,7 +119,7 @@
       website_show: true
       star_ref: null
     - text: "Architected migration of internal Retool workflows to Expo/React Native, reducing vendor licensing overhead."
-      variant: "infrastructure"
+      variant: "general"
       cv_priority: 1
       website_show: true
       star_ref: null
@@ -130,7 +130,7 @@
       star_ref: null
     - text: "Diagnosed and resolved issues in a large existing ERPNext installation; introduced LLM-assisted debugging workflows."
       variant: "infrastructure"
-      cv_priority: 3
+      cv_priority: 2
       website_show: true
       star_ref: null
 
