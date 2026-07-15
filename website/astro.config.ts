@@ -60,8 +60,8 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [readingTimeRemarkPlugin],
     rehypePlugins: [responsiveTablesRehypePlugin, lazyImagesRehypePlugin],
+    shikiConfig: { theme: 'github-light' },
   },
-
   vite: {
     plugins: [tailwindcss()],
     resolve: {

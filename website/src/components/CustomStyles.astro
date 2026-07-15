@@ -167,18 +167,22 @@ import '@fontsource-variable/geist-mono';
   }
 
   /* Code blocks */
-  pre {
-    background-color: var(--aw-paper-raised);
+  /* Code blocks — site surface; Astro/Shiki inline spans own token color */
+  pre,
+  pre.astro-code {
+    background-color: var(--aw-paper-raised) !important;
+    color: var(--aw-ink) !important;
     border: 1px solid var(--aw-hairline);
     padding: 1rem;
     overflow-x: auto;
     line-height: 1.55;
   }
-  pre code {
+  pre code,
+  .astro-code code {
     background: none;
     border: none;
     padding: 0;
-    color: var(--aw-ink);
+    color: inherit;
   }
 
   /* Nav links and buttons — Geist Mono with weight */
